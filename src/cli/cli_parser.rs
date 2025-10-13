@@ -7,19 +7,6 @@ use clap::{Parser, Subcommand, crate_name, crate_version, crate_authors, crate_d
     author = crate_authors!(),
     about = crate_description!(),
     long_about = None,
-    help_template = "\
-Iris {version}
-Intelligent CLI file organizer
-
-USAGE:
-  iris <COMMANDS> <FLAGS>
-
-COMMANDS:
-{subcommands}
-
-OPTIONS:
-{options}
-"
 )]
 
 // TODO: Implement -s as a shorthand alternative to sort
@@ -35,7 +22,22 @@ pub enum Commands {
         path: String,
     },
     /// Self-update iris
-    Update,
+    Update, // TODO: Implement -u as a shorthand
+    /// Manage configuration
+    Config { // TODO: Implement -c as a shorthand
+        #[command(subcommand)]
+        action: ConfigAction,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum ConfigAction {
+    /// Display the contents of config file
+    Show,
+    /// Edit the config file
+    Edit, // TODO: Implement -ce as a shorthand
+    /// Reset the config file to defaults
+    Reset, // TODO: Implement -cr as a shorthand
 }
 
 #[cfg(test)]

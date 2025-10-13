@@ -1,0 +1,72 @@
+# ==============================================
+#              DOCUMENTS CATEGORY
+# ==============================================
+
+[category.documents]
+
+# Enable or disable this category
+enabled = true  # default: true [true | false]
+
+# File extensions included in this category
+# Example: "pdf" → matches all *.pdf files
+extension = [
+    "pdf", "doc", "docx", "txt", "md", "rtf", "odt",
+    "xlsx", "xls", "csv", "ppt", "pptx"
+]
+
+# Path configuration:
+# - relative_path → used if mode = "relative"
+#     ~/Downloads/file.pdf -> ~/Downloads/documents/file.pdf
+# - absolute_path → used if mode = "absolute"
+#     ~/Downloads/file.pdf -> /home/user/Documents/file.pdf
+relative_path = "documents"
+absolute_path = "/home/user/Documents"
+
+# Search recursively in subdirectories?
+# recursive = true  → include ~/Downloads/**/file.pdf
+# recursive = false → only top-level ~/Downloads/file.pdf
+recursive = false  # default: false [true | false]
+
+
+# ========================
+# DOCUMENTS CATEGORY RULES
+# ========================
+
+# Each [[category.documents.rule]] defines a specific rule for files
+# Rules can filter files by extension, regex, filename, or last modified time
+
+# --- Rule 1: Move PDFs modified in the last 7 days ---
+# [[category.documents.rule]]
+# Match files by extension
+# extension = ["pdf"]
+# Only include files modified within the last X days
+# Example: modified_within_days = 7 → files changed in the last week
+# modified_within_days = 7
+# Destination folder relative to category root
+# Result: ~/Downloads/documents/pdf/recent/file.pdf
+# folder = "pdf/recent"
+
+
+# --- Rule 2: Move PDFs matching a regex pattern ---
+# [[category.documents.rule]]
+# Match files whose filename matches the regex pattern
+# Example: ".*report_[0-9]{4}.*\.pdf" → matches report_2025.pdf, report_2024.pdf
+# filename_regex = ".*report_[0-9]{4}.*\\.pdf"
+# Destination folder relative to category root
+# Result: ~/Downloads/documents/pdf/reports/file.pdf
+# folder = "pdf/reports"
+
+
+# --- Rule 3: Move files containing "invoice" in the filename ---
+# [[category.documents.rule]]
+# Match files containing specific text in the filename
+# Example: filename_contains = "invoice" → matches invoice_001.pdf
+# filename_contains = "invoice"
+# match_case = false → case-insensitive matching
+# Example:
+# if false: matches both invoice.pdf, INVOICE.pdf
+# if true: matches only invoice.pdf even INVOICE.pdf exists
+# match_case = false
+# Destination folder relative to category root
+# Result: ~/Downloads/documents/notes/invoices/file.pdf
+# folder = "notes/invoices"

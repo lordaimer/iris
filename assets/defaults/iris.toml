@@ -1,53 +1,106 @@
 # {project_name} v{version} by {author}
 
-# =========================
-# GENERAL SETTINGS
-# =========================
-
+# ==============================================
+#                GENERAL SETTINGS
+# ==============================================
 [general]
-# Organization strategy:
-#   system  = use OS-specific directories (~/Documents, ~/Pictures, etc.)
-#   local   = organize within watched/specified folders
-#   custom  = use custom paths defined below
-mode = "local"
 
-# -------------------------
-# Custom base directories
-# Only used if mode = "custom"
-# Must include all categories from [file.cat] if custom mode is used
-# Please specify full paths for where you want each category to be
-# -------------------------
-[general.mode.custom]
-documents = "{home_dir}/Documents"
-# pictures  = "{home_dir}/Pictures"
-# downloads = "{home_dir}/Downloads"
+# Target folder for the "iris sort" command:
+# "required"  => must specify path manually
+#                e.g., iris sort ~/Downloads
+# "downloads" => always sort the Downloads folder
+#                e.g., iris sort (runs anywhere)
+# "current"   => sort the current working directory
+#                e.g., iris sort (inside target folder)
+target = "required"  # default: required [required | downloads | current]
 
-# Operation target:
-#    "."   = current working directory
-#    "dls" = downloads directory
-#    "!"   = path is required (default)
-target = "!"
+# Organization mode:
+# "relative" => organize files within their parent folder using relative_path subfolders
+#               e.g., parent/relative_path/file.ext
+# "absolute" => organize files anywhere using absolute_path
+#               e.g., /home/user/MyDocuments/file.ext
+mode = "relative"  # default: relative [relative | absolute]
 
-# =========================
-# FILE SETTINGS
-# =========================
+# Folder to look for modular category schemas
+# Iris will scan this folder for *.toml files defining categories.
+# Categories defined inside the main file will also be loaded.
+categories_path = "./categories"  # e.g., "categories"
 
-# -------------------------
-# FILE CATEGORY RULES
-# -------------------------
 
-# --- CATEGORY: DOCUMENTS ---
-[file.cat.docs]
-# Enable documents categorization (if false, PDFs go to misc folder)
-enabled = true
+# ==============================================
+#                 FILE NAMING
+# ==============================================
+# [file_naming]
 
-# Set the hidden attribute for the documents folder
-hidden = false
+# Enable/disable renaming of files
+# e.g., hello world.txt → hello.world.txt (if rename_files = true)
+# rename_files = false  # default: false [true | false]
 
-# File extensions categorized as documents
-extensions = ["pdf"]  # e.g., ["pdf", "docx", "txt"]
+# Character to replace spaces with (only if rename_files = true)
+# e.g., "hello world.txt" → "hello-world.txt" (if "-")
+# space_replacement = "."  # default: "." ["-", "_", ".", ""]
 
-# Folder name to use if mode = local
-# If mode = system: ~/Documents
-# If mode = custom: use the path from [general.mode.custom.documents]
-dir_name = "documents"
+# Renaming style applied to filenames (if rename_files = true)
+# Examples:
+# "lower"  => hello.world.txt
+# "upper"  => HELLO.WORLD.TXT
+# "title"  => Hello.World.Txt
+# "camel" => helloWorld.txt
+# "pascal" => HelloWorld.txt
+# "snake" => hello_world.txt
+# "kebab" => hello-world.txt
+# rename_method = "lower"  # default: lower [lower | upper | title | camel | pascal | snake | kebab]
+
+# Automatically remove invalid filesystem characters
+# e.g., "my:file?.txt" → "myfile.txt"
+# sanitize_names = true  # default: true [true | false]
+
+
+# ==============================================
+#                FILE EXCLUSIONS
+# ==============================================
+# [file_exclusions]
+
+# File patterns to exclude (glob syntax)
+# e.g., "*.tmp" excludes all temporary files
+# patterns = [
+#     "*.tmp",
+#     "*.temp",
+#     ".DS_Store",
+#     "Thumbs.db",
+#     "desktop.ini"
+# ]
+
+# Directory names to ignore completely
+# e.g., node_modules and .git folders won’t be processed
+# directories = [
+#     ".git",
+#     ".svn",
+#     "node_modules",
+#     "__pycache__",
+#     ".venv",
+#     ".idea"
+# ]
+
+# Minimum file size to process (in bytes)
+# e.g., 1024 → only process files ≥ 1 KB; 0 → no limit
+# min_file_size = 0  # default: 0
+
+# Maximum file size to process (in bytes)
+# e.g., 1048576 → skip files larger than 1 MB; 0 → no limit
+
+
+# ==============================================
+#         CATEGORIES (GLOBAL SETTINGS)
+# ==============================================
+# Categories can be defined here (optional) or 
+# inside modular TOML files in `categories_path` (recommended)
+# Iris will load categories from both sources.
+#
+# Example structure for an in-file category (optional):
+# [category.documents]
+# enabled = true
+# extension = ["pdf", "docx", "txt"]
+# relative_path = "documents"
+# absolute_path = "/home/user/Documents"
+# recursive = false
