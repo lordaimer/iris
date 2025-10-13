@@ -1,0 +1,19 @@
+[package]
+name = "iris"
+version = "0.1.1"
+edition = "2021"
+authors = ["lordaimer <araneaimer@gmail.com>"]
+description = "Smart file organization"
+license = "MIT"
+repository = "https://github.com/lordaimer/iris"
+readme = "README.md"
+homepage = "https://github.com/lordaimer/iris"
+keywords = ["cli", "organizer", "automation", "filesystem", "sorter"]
+categories = ["command-line-utilities", "filesystem", "productivity"]
+
+[dependencies]
+clap = { version = "4", features = ["derive", "cargo"] }
+dirs = "6.0.0"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.9.8"
+toml_edit = "0.23.7"

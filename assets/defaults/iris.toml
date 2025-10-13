@@ -1,0 +1,53 @@
+# {project_name} v{version} by {author}
+
+# =========================
+# GENERAL SETTINGS
+# =========================
+
+[general]
+# Organization strategy:
+#   system  = use OS-specific directories (~/Documents, ~/Pictures, etc.)
+#   local   = organize within watched/specified folders
+#   custom  = use custom paths defined below
+mode = "local"
+
+# -------------------------
+# Custom base directories
+# Only used if mode = "custom"
+# Must include all categories from [file.cat] if custom mode is used
+# Please specify full paths for where you want each category to be
+# -------------------------
+[general.mode.custom]
+documents = "{home_dir}/Documents"
+# pictures  = "{home_dir}/Pictures"
+# downloads = "{home_dir}/Downloads"
+
+# Operation target:
+#    "."   = current working directory
+#    "dls" = downloads directory
+#    "!"   = path is required (default)
+target = "!"
+
+# =========================
+# FILE SETTINGS
+# =========================
+
+# -------------------------
+# FILE CATEGORY RULES
+# -------------------------
+
+# --- CATEGORY: DOCUMENTS ---
+[file.cat.docs]
+# Enable documents categorization (if false, PDFs go to misc folder)
+enabled = true
+
+# Set the hidden attribute for the documents folder
+hidden = false
+
+# File extensions categorized as documents
+extensions = ["pdf"]  # e.g., ["pdf", "docx", "txt"]
+
+# Folder name to use if mode = local
+# If mode = system: ~/Documents
+# If mode = custom: use the path from [general.mode.custom.documents]
+dir_name = "documents"
