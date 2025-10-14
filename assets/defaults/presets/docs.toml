@@ -1,13 +1,13 @@
 # ==============================================
-#              DOCUMENTS CATEGORY
+#              DOCUMENTS PRESET
 # ==============================================
 
-[category.documents]
+[preset.documents]
 
-# Enable or disable this category
+# Enable or disable this preset
 enabled = true  # default: true [true | false]
 
-# File extensions included in this category
+# File extensions included in this preset
 # Example: "pdf" → matches all *.pdf files
 extension = [
     "pdf", "doc", "docx", "txt", "md", "rtf", "odt",
@@ -29,36 +29,36 @@ recursive = false  # default: false [true | false]
 
 
 # ========================
-# DOCUMENTS CATEGORY RULES
+# DOCUMENTS PRESET RULES
 # ========================
 
-# Each [[category.documents.rule]] defines a specific rule for files
+# Each [[preset.documents.rule]] defines a specific rule for files
 # Rules can filter files by extension, regex, filename, or last modified time
 
 # --- Rule 1: Move PDFs modified in the last 7 days ---
-# [[category.documents.rule]]
+# [[preset.documents.rule]]
 # Match files by extension
 # extension = ["pdf"]
 # Only include files modified within the last X days
 # Example: modified_within_days = 7 → files changed in the last week
 # modified_within_days = 7
-# Destination folder relative to category root
+# Destination folder relative to preset root
 # Result: ~/Downloads/documents/pdf/recent/file.pdf
 # folder = "pdf/recent"
 
 
 # --- Rule 2: Move PDFs matching a regex pattern ---
-# [[category.documents.rule]]
+# [[preset.documents.rule]]
 # Match files whose filename matches the regex pattern
 # Example: ".*report_[0-9]{4}.*\.pdf" → matches report_2025.pdf, report_2024.pdf
 # filename_regex = ".*report_[0-9]{4}.*\\.pdf"
-# Destination folder relative to category root
+# Destination folder relative to preset root
 # Result: ~/Downloads/documents/pdf/reports/file.pdf
 # folder = "pdf/reports"
 
 
 # --- Rule 3: Move files containing "invoice" in the filename ---
-# [[category.documents.rule]]
+# [[preset.documents.rule]]
 # Match files containing specific text in the filename
 # Example: filename_contains = "invoice" → matches invoice_001.pdf
 # filename_contains = "invoice"
@@ -67,6 +67,6 @@ recursive = false  # default: false [true | false]
 # if false: matches both invoice.pdf, INVOICE.pdf
 # if true: matches only invoice.pdf even INVOICE.pdf exists
 # match_case = false
-# Destination folder relative to category root
+# Destination folder relative to preset root
 # Result: ~/Downloads/documents/notes/invoices/file.pdf
 # folder = "notes/invoices"

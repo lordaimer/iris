@@ -247,6 +247,7 @@ dependencies = [
  "dirs",
  "edit",
  "serde",
+ "tempfile",
  "toml",
  "toml_edit",
  "which 8.0.0",

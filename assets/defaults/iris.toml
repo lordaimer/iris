@@ -24,7 +24,8 @@ mode = "relative"  # default: relative [relative | absolute]
 # Folder to look for modular category schemas
 # Iris will scan this folder for *.toml files defining categories.
 # Categories defined inside the main file will also be loaded.
-categories_path = "./categories"  # e.g., "categories"
+# MODULAR SUPPORT FOR PRESETS IS TO BE IMPLEMENTED IN v1. HENCE, IT'S COMMENTED OUT
+# presets_path = "./presets"  # e.g., "presets"
 
 
 # ==============================================
@@ -91,10 +92,10 @@ categories_path = "./categories"  # e.g., "categories"
 
 
 # ==============================================
-#         CATEGORIES (GLOBAL SETTINGS)
+#          PRESETS (GLOBAL SETTINGS)
 # ==============================================
-# Categories can be defined here (optional) or 
-# inside modular TOML files in `categories_path` (recommended)
+# Presets can be defined here (optional) or
+# inside modular TOML files in `presets_path` (recommended)
 # Iris will load categories from both sources.
 #
 # Example structure for an in-file category (optional):
@@ -104,3 +105,23 @@ categories_path = "./categories"  # e.g., "categories"
 # relative_path = "documents"
 # absolute_path = "/home/user/Documents"
 # recursive = false
+
+[preset.documents]
+
+# Enable or disable this preset
+enabled = true  # default: true [true | false]
+
+# File extensions included in this preset
+# Example: "pdf" → matches all *.pdf files
+extension = [
+    "pdf", "doc", "docx", "txt", "md", "rtf", "odt",
+    "xlsx", "xls", "csv", "ppt", "pptx"
+]
+
+# Path configuration:
+# - relative_path → used if mode = "relative"
+#     ~/Downloads/file.pdf -> ~/Downloads/documents/file.pdf
+# - absolute_path → used if mode = "absolute"
+#     ~/Downloads/file.pdf -> /home/user/Documents/file.pdf
+relative_path = "documents"
+absolute_path = "~/Documents"
