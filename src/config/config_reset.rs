@@ -6,10 +6,15 @@ use crate::config::config_init::init_defaults;
 
 
 /// Reset the config file to defaults based on user prompt
-pub fn reset_config() -> Result<(), Box<dyn std::error::Error>> {
-    if !confirm("Are you sure you want to reset the config?") {
-        println!("{}", "Aborted.".yellow());
-        return Ok(());
+pub fn reset_config(noconfirm: bool) -> Result<(), Box<dyn std::error::Error>> {
+    if !noconfirm {
+        if !confirm("Are you sure you want to reset the config?") {
+            println!("{}", "Aborted.".yellow());
+            return Ok(());
+        }
+    } else {
+        // TODO: print this only if log level: verbose
+        println!("{}", "Skipping confirmation...".green());
     }
 
     let config_path = get_config_path();

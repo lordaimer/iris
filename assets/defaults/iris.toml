@@ -25,7 +25,7 @@ mode = "relative"  # default: relative [relative | absolute]
 # Iris will scan this folder for *.toml files defining categories.
 # Categories defined inside the main file will also be loaded.
 # MODULAR SUPPORT FOR PRESETS IS TO BE IMPLEMENTED IN v1. HENCE, IT'S COMMENTED OUT
-# presets_path = "./presets"  # e.g., "presets"
+presets_path = "./presets" # e.g., "presets"
 
 
 # ==============================================

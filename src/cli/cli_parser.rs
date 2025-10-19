@@ -9,7 +9,6 @@ use clap::{Parser, Subcommand, crate_name, crate_version, crate_authors, crate_d
     long_about = None,
 )]
 
-// TODO: Implement -s as a shorthand alternative to sort
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
@@ -17,14 +16,15 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    /// Sort the files in the specified directory
+    /// Sort files in a directory or use the config target if none is given.
     Sort {
-        path: String,
+        /// Directory to sort (optional unless target = "required").
+        path: Option<String>,
     },
     /// Self-update iris
-    Update, // TODO: Implement -u as a shorthand
+    Update,
     /// Manage configuration
-    Config { // TODO: Implement -c as a shorthand
+    Config {
         #[command(subcommand)]
         action: ConfigAction,
     },
@@ -35,9 +35,13 @@ pub enum ConfigAction {
     /// Display the contents of config file
     Show,
     /// Edit the config file
-    Edit, // TODO: Implement -ce as a shorthand
+    Edit,
     /// Reset the config file to defaults
-    Reset, // TODO: Implement -cr as a shorthand
+    Reset {
+        /// Skip confirmation prompt
+        #[arg(short = 'y', long = "yes")]
+        noconfirm: bool,
+    },
 }
 
 #[cfg(test)]

@@ -1,11 +1,14 @@
 mod cli;
 mod paths;
 mod config;
+mod core;
 
 use clap::Parser;
 use cli::cli_parser::{Cli, Commands, ConfigAction};
 use colored::Colorize;
-use config::{config_init, config_edit, config_reset, config_show, config_parser, config_validator};
+use config::{config_init, config_edit, config_reset, config_show, config_parser, config_validator, config_processor};
+use config_processor::IrisConfig;
+use crate::core::resolver::target_resolver;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Config file path
@@ -34,8 +37,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ConfigAction::Edit => {
                 handle_result(config_edit::edit_config());
             }
-            ConfigAction::Reset => {
-                handle_result(config_reset::reset_config());
+            ConfigAction::Reset { noconfirm} => {
+                handle_result(config_reset::reset_config(*noconfirm));
             }
         },
         Commands::Update => {
@@ -43,7 +46,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
 
         // Commands that require a valid config
-        Commands::Sort { .. } => {
+        Commands::Sort { path } => {
             // parse the config
             let value = match config_parser::parse_config() {
                 Ok(v) => {
@@ -58,15 +61,40 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // validate the config
             if let Err(err_msg) = config_validator::validate_config(&value) {
-                eprintln!("error: {}", err_msg);
+                eprintln!("Config file is invalid. Error: {}", err_msg);
                 std::process::exit(1);
             }
 
             println!("{}", "Config file is valid".green());
 
-            match &cli.command {
-                Commands::Sort { path } => println!("Sorting {}", path),
-                _ => unreachable!(),
+            // process the config into IrisConfig struct
+            let iris_config = match IrisConfig::from_value(&value) {
+                Ok(config) => config,
+                Err(e) => {
+                    eprintln!("error processing config:\n {}", e);
+                    std::process::exit(1);
+                }
+            };
+            println!("{}", "Config processed successfully".green());
+
+            // resolve the actual target path based on config and CLI args
+            let target_path = match target_resolver::resolve_target(&iris_config, path.as_ref()) {
+                Ok(p ) => p,
+                Err(e) => {
+                    eprintln!("error: {}", e);
+                    std::process::exit(1);
+                }
+            };
+            if path.is_some() {
+                println!("{}", format!("Sorting {}", target_path.display()).green());
+            } else {
+                println!("{}",
+                    format!(
+                        "No path provided. Using config target: {}",
+                        target_path.display()
+                    )
+                    .yellow()
+                );
             }
         }
     }

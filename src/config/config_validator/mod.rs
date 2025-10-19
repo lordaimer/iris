@@ -1,11 +1,11 @@
-mod presets;
-mod general;
+mod validate_presets;
+mod validate_general;
 #[cfg(test)]
 mod tests;
 
 use toml::Value;
-use general::validate_general;
-use presets::validate_presets;
+use validate_general::validate_general;
+use validate_presets::validate_presets;
 
 #[derive(Debug)]
 pub enum ValidationError {
