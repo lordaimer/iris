@@ -1,3 +1,7 @@
+// TODO: if two presets with same extension are enabled, they should have different relative_path and absolute_path
+// TODO: implement a precedence system where the top most preset has the highest precedence
+// TODO: implement a duplicate entry error for duplicate keys in a preset
+// TODO: implement a duplicate entry error for duplicate extensions in the same preset
 use std::collections::HashMap;
 use toml::Value;
 use super::ValidationError;
@@ -18,6 +22,17 @@ pub fn validate_presets(value: &Value) -> Result<(), ValidationError> {
         return Err(ValidationError::NoEntries {
             section: "presets".to_string(),
         });
+    }
+
+    // New: check if at least one preset is enabled
+    let has_enabled = presets.iter().any(|(_, v)| {
+        v.as_table()
+            .and_then(|t| t.get("enabled"))
+            .and_then(|e| e.as_bool())
+            .unwrap_or(false)
+    });
+    if !has_enabled {
+        return Err(ValidationError::NoEnabledPresets);
     }
 
     let mut allowed_entries: HashMap<&str, (bool, Option<Vec<&str>>)> = HashMap::new();

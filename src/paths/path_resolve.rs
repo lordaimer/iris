@@ -4,31 +4,58 @@ use std::path::{Component, Path, PathBuf};
 use shellexpand;
 use dunce;
 
+#[cfg(windows)]
+/// Remove surrounding quotes or a stray trailing quote from a path-like input on Windows.
+/// This helps with PowerShell/cmd behaviors where a trailing backslash can yield an unmatched quote.
+fn dequote(s: &str) -> std::borrow::Cow<'_, str> {
+    if s.len() >= 2 {
+        let starts_dq = s.starts_with('"');
+        let ends_dq = s.ends_with('"');
+        let starts_sq = s.starts_with('\'');
+        let ends_sq = s.ends_with('\'');
+        if (starts_dq && ends_dq) || (starts_sq && ends_sq) {
+            return std::borrow::Cow::Owned(s[1..s.len() - 1].to_string());
+        }
+    }
+    if s.ends_with('"') || s.ends_with('\'') {
+        return std::borrow::Cow::Owned(s[..s.len() - 1].to_string());
+    }
+    std::borrow::Cow::Borrowed(s)
+}
+
+#[cfg(not(windows))]
+/// On non-Windows we do not dequote: shells typically strip quotes already and
+/// spaces/quotes may be intentional path characters.
+fn dequote(s: &str) -> std::borrow::Cow<'_, str> {
+    std::borrow::Cow::Borrowed(s)
+}
+
 /// Resolve and normalize a path string.
 /// `must_exist` enforces existence (read-only). `canonicalize` follows symlinks (requires existence).
 pub fn resolve_path(
-    input: &str,
+    original_input: &str,
     must_exist: bool,
     canonicalize: bool,
 ) -> Result<PathBuf, String> {
+    let input = dequote(original_input);
     if input.trim().is_empty() {
         return Err("empty path provided".into());
     }
 
     // Pre-expand Windows %VAR% syntax (no operations on non-Windows)
-    let preexpanded = pre_expand_percent_vars(input);
+    let preexpanded = pre_expand_percent_vars(&input);
 
     // Expand ~ and environment variables like $VAR and ${VAR}
     #[cfg(not(windows))]
     let expanded_str: std::borrow::Cow<'_, str> = {
         let s = shellexpand::full(&preexpanded)
-            .map_err(|e| format!("failed to expand '{}': {}", input, e))?;
+            .map_err(|e| format!("failed to expand '{}': {}", original_input, e))?;
         std::borrow::Cow::Owned(s.replace('\\', "/"))
     };
 
     #[cfg(windows)]
     let expanded_str = shellexpand::full(&preexpanded)
-        .map_err(|e| format!("failed to expand '{}': {}", input, e))?;
+        .map_err(|e| format!("failed to expand '{}': {}", original_input, e))?;
 
     // Build raw PathBuf from expanded string
     let raw_path = PathBuf::from(expanded_str.as_ref());
@@ -63,7 +90,7 @@ pub fn resolve_path(
     // If canonicalize requested then use fs::canonicalize (will fail if not exist)
     let normalized = if canonicalize {
         fs::canonicalize(&resolved)
-            .map_err(|e| format!("failed to canonicalize '{}': {}", input, e))?
+            .map_err(|e| format!("failed to canonicalize '{}': {}", original_input, e))?
     } else {
         // Normalize components (collapse ., .., mixed separators) without touching symlinks.
         normalize_components(&resolved)
@@ -76,7 +103,7 @@ pub fn resolve_path(
     if must_exist && !normalized.exists() {
         return Err(format!(
             "path does not exist: '{}' (resolved to: {})",
-            input,
+            original_input,
             normalized.display()
         ));
     }
@@ -332,5 +359,40 @@ mod tests {
             let result = resolve_path(input, false, false).unwrap();
             assert_eq!(result, PathBuf::from(r"\\server\share\folder\file.txt"));
         }
+
+        #[test]
+        fn test_dequote_surrounding_quotes_and_spaces_preserved() {
+            let s = r#""C:\\path with spaces""#;
+            let dq = dequote(s);
+            assert_eq!(dq, r#"C:\\path with spaces"#);
+        }
+
+        #[test]
+        fn test_dequote_stray_trailing_quote_removed() {
+            let s = r#"C:\\Program Files\\""#;
+            let dq = dequote(s);
+            assert_eq!(dq, r#"C:\\Program Files\\"#);
+        }
+
+        #[test]
+        fn test_dequote_embedded_quote_unchanged() {
+            let s = r#"C:\\foo\"bar"#;
+            let dq = dequote(s);
+            assert_eq!(dq, s);
+        }
+    }
+
+    // Non-Windows: dequote is a no-op
+    #[cfg(not(windows))]
+    mod non_windows_tests {
+        use super::*;
+
+        #[test]
+        fn test_dequote_noop_preserves_whitespace_and_quotes() {
+            let s = r#" "/path with spaces" "#;
+            let dq = dequote(s);
+            assert_eq!(dq, s);
+        }
     }
 }
+

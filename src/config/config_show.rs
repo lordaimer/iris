@@ -1,3 +1,4 @@
+// TODO: Instead of printing the entire file to std out directly. Paginate it and display nicely like bat
 /// Display the config file contents with `iris config show`
 use std::process::Command;
 use crate::paths::config_path::get_config_path;

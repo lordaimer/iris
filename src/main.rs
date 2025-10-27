@@ -1,3 +1,4 @@
+// TODO: Implement right click context menu support on windows: Sort with Iris
 mod cli;
 mod paths;
 mod config;
@@ -8,7 +9,7 @@ use cli::cli_parser::{Cli, Commands, ConfigAction};
 use colored::Colorize;
 use config::{config_init, config_edit, config_reset, config_show, config_parser, config_validator, config_processor};
 use config_processor::IrisConfig;
-use crate::core::resolver::target_resolver;
+use core::{resolver::target_resolver, sort::sort};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Config file path
@@ -53,8 +54,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("{}", "Successfully parsed config file, validating...".green());
                     v
                 },
-                Err(_) => {
-                    eprintln!("failed to parse config file.");
+                Err(e) => {
+                    eprintln!("failed to parse config file. error: {}", e);
                     std::process::exit(1);
                 }
             };
@@ -85,16 +86,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     std::process::exit(1);
                 }
             };
-            if path.is_some() {
-                println!("{}", format!("Sorting {}", target_path.display()).green());
-            } else {
-                println!("{}",
-                    format!(
-                        "No path provided. Using config target: {}",
-                        target_path.display()
-                    )
-                    .yellow()
-                );
+            if let Err(e) = sort::sort(target_path.as_path(), &iris_config) {
+                eprintln!("{}", format!("Error: {}", e).red());
+                std::process::exit(1);
             }
         }
     }
@@ -106,7 +100,8 @@ fn handle_result<T, E: std::fmt::Display>(res: Result<T, E>) -> Option<T> {
     match res {
         Ok(val) => Some(val),
         Err(e) => {
-            eprintln!("Error: {}", e);
+            use colored::Colorize;
+            eprintln!("{}", format!("Error: {}", e).red());
             None
         }
     }

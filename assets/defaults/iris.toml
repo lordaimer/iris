@@ -96,10 +96,10 @@ presets_path = "./presets" # e.g., "presets"
 # ==============================================
 # Presets can be defined here (optional) or
 # inside modular TOML files in `presets_path` (recommended)
-# Iris will load categories from both sources.
+# Iris will load presets from both sources.
 #
 # Example structure for an in-file category (optional):
-# [category.documents]
+# [preset.documents]
 # enabled = true
 # extension = ["pdf", "docx", "txt"]
 # relative_path = "documents"
@@ -114,8 +114,7 @@ enabled = true  # default: true [true | false]
 # File extensions included in this preset
 # Example: "pdf" → matches all *.pdf files
 extension = [
-    "pdf", "doc", "docx", "txt", "md", "rtf", "odt",
-    "xlsx", "xls", "csv", "ppt", "pptx"
+    "pdf", "doc", "txt"
 ]
 
 # Path configuration:

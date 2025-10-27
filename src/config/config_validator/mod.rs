@@ -27,6 +27,7 @@ pub enum ValidationError {
     NoEntries {
         section: String,
     },
+    NoEnabledPresets,
     Io(std::io::Error),
 }
 
@@ -54,6 +55,9 @@ impl std::fmt::Display for ValidationError {
             },
             ValidationError::NoEntries { section } => {
                 write!(f, "no entries for {} section", section)
+            }
+            ValidationError::NoEnabledPresets => {
+                write!(f, "There are no enabled presets in the [preset] section of the config file.")
             }
             ValidationError::Io(e) => write!(f, "input/output error while validating config: {}", e),
         }

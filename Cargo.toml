@@ -24,3 +24,9 @@ tempfile = "3.23.0"
 anyhow = "1.0.100"
 shellexpand = "3.1.1"
 dunce = "1.0.5"
+walkdir = "2"
+blake3 = "1"
+rayon = "1.10"
+
+[build-dependencies]
+winres = "0.1.12"

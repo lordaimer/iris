@@ -1,5 +1,4 @@
 /// Resolve the path to target based on the target field in config file
-// TODO: Integrate target_resolver with main.rs
 use crate::config::config_processor::{Target, IrisConfig};
 use std::path::PathBuf;
 use std::env;
