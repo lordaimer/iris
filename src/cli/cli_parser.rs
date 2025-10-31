@@ -28,6 +28,12 @@ pub enum Commands {
         #[command(subcommand)]
         action: ConfigAction,
     },
+    /// Manage Windows context menu integration
+    #[cfg(target_os = "windows")]
+    Context {
+        #[command(subcommand)]
+        action: ContextAction,
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -42,6 +48,17 @@ pub enum ConfigAction {
         #[arg(short = 'y', long = "yes")]
         noconfirm: bool,
     },
+}
+
+#[cfg(target_os = "windows")]
+#[derive(Subcommand, Debug)]
+pub enum ContextAction {
+    /// Install the Windows right-click menu entry
+    #[command(alias = "add")]
+    Install,
+    /// Uninstall the Windows right-click menu entry
+    #[command(alias = "remove")]
+    Uninstall,
 }
 
 #[cfg(test)]

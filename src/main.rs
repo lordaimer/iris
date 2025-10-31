@@ -1,11 +1,11 @@
-// TODO: Implement right click context menu support on windows: Sort with Iris
 mod cli;
 mod paths;
 mod config;
 mod core;
+mod platform;
 
 use clap::Parser;
-use cli::cli_parser::{Cli, Commands, ConfigAction};
+use cli::cli_parser::{Cli, Commands, ConfigAction, ContextAction};
 use colored::Colorize;
 use config::{config_init, config_edit, config_reset, config_show, config_parser, config_validator, config_processor};
 use config_processor::IrisConfig;
@@ -44,6 +44,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         Commands::Update => {
             println!("Updating Iris");
+        },
+
+        #[cfg(target_os = "windows")]
+        Commands::Context { action } => {
+            match action {
+                ContextAction::Install => {
+                    use platform::windows::context_menu::install_context_menu;
+                    handle_result(install_context_menu());
+                }
+                ContextAction::Uninstall => {
+                    use platform::windows::context_menu::uninstall_context_menu;
+                    handle_result(uninstall_context_menu());
+                }
+            }
         },
 
         // Commands that require a valid config

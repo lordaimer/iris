@@ -27,6 +27,8 @@ dunce = "1.0.5"
 walkdir = "2"
 blake3 = "1"
 rayon = "1.10"
+winreg = "0.52"
 
 [build-dependencies]
 winres = "0.1.12"
+
