@@ -1,6 +1,5 @@
 // TODO: Implement dry-run (simulation) before actual file operations. provide support for  --dry-run (alias = [ --sim | --simulate ]) flag
 // TODO: Implement undo feature as a safe revert option incase something which should'nt be sorted gets sorted
-// TODO: A global "*" catch-all extension support to sort files which don't match any presets into a misc folder
 // TODO: Break this into smaller modules and functions and make this the entry point for the sort command
 // TODO: Write unit tests for this module
 // TODO: Skip hashing for small files (less than 1MB) or when rename succeeds

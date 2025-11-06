@@ -124,3 +124,292 @@ extension = [
 #     ~/Downloads/file.pdf -> /home/user/Documents/file.pdf
 relative_path = "documents"
 absolute_path = "~/Documents"
+
+# Documents (top-level subtypes as separate presets)
+[preset.documents_pdf]
+enabled = true
+extension = [
+    "pdf"
+]
+relative_path = "documents/pdf"
+absolute_path = "~/Documents/pdf"
+
+[preset.documents_word]
+enabled = true
+extension = [
+    "doc", "docx", "dot", "dotx"
+]
+relative_path = "documents/word"
+absolute_path = "~/Documents/word"
+
+[preset.documents_spreadsheets]
+enabled = true
+extension = [
+    "xls", "xlsx", "xlsm", "csv", "tsv", "ods", "numbers"
+]
+relative_path = "documents/spreadsheets"
+absolute_path = "~/Documents/spreadsheets"
+
+[preset.documents_presentations]
+enabled = true
+extension = [
+    "ppt", "pptx", "odp", "key"
+]
+relative_path = "documents/presentations"
+absolute_path = "~/Documents/presentations"
+
+[preset.documents_markdown]
+enabled = true
+extension = [
+    "md", "markdown"
+]
+relative_path = "documents/markdown"
+absolute_path = "~/Documents/markdown"
+
+[preset.documents_latex]
+enabled = true
+extension = [
+    "tex", "bib"
+]
+relative_path = "documents/latex"
+absolute_path = "~/Documents/latex"
+
+# Documents: Ebooks
+[preset.ebooks]
+enabled = true
+extension = [
+    "epub", "mobi", "azw", "azw3", "fb2", "ibooks", "djvu", "djv",
+    "cbr", "cbz", "cbt", "cb7"
+]
+relative_path = "ebooks"
+absolute_path = "~/Books"
+
+# ----------------------------------------------
+# Images
+[preset.images]
+enabled = true
+extension = [
+    "jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff", "heic", "heif", "avif",
+    "svg", "ai", "eps"
+]
+relative_path = "images"
+absolute_path = "~/Pictures"
+
+# Images (top-level subtypes as separate presets)
+[preset.images_vector]
+enabled = true
+extension = [
+    "svg", "ai", "eps"
+]
+relative_path = "images/vector"
+absolute_path = "~/Pictures/vector"
+
+[preset.images_raw]
+enabled = true
+extension = [
+    "cr2", "cr3", "nef", "arw", "orf", "raf", "dng", "srw", "rw2", "pef"
+]
+relative_path = "images/raw"
+absolute_path = "~/Pictures/raw"
+
+[preset.images_sidecars]
+enabled = true
+extension = [
+    "xmp"
+]
+relative_path = "images/sidecars"
+absolute_path = "~/Pictures/sidecars"
+
+# ----------------------------------------------
+# Audio
+[preset.audio]
+enabled = true
+extension = [
+    "mp3", "aac", "m4a", "flac", "wav", "aiff", "aif", "ogg", "oga", "opus",
+    "wma", "alac", "mid", "midi"
+]
+relative_path = "audio"
+absolute_path = "~/Music"
+
+# ----------------------------------------------
+# Video
+[preset.video]
+enabled = true
+extension = [
+    "mp4", "mkv", "webm", "avi", "mov", "m4v", "wmv", "flv", "3gp", "ts", "mpeg", "mpg"
+]
+relative_path = "video"
+absolute_path = "~/Videos"
+
+# Video (top-level subtype)
+[preset.video_subtitles]
+enabled = true
+extension = [
+    "srt", "ass", "ssa", "sub", "idx", "sup"
+]
+relative_path = "video/subtitles"
+absolute_path = "~/Videos/subtitles"
+
+# ----------------------------------------------
+# Archives and disk images
+[preset.archives]
+enabled = true
+extension = [
+    "zip", "rar", "7z", "tar", "gz", "bz2", "xz", "zst", "lzma",
+    "tar.gz", "tar.bz2", "tar.xz", "tar.zst",
+    "iso", "dmg", "img"
+]
+relative_path = "archives"
+absolute_path = "~/Archives"
+
+
+# ----------------------------------------------
+# Installers and packages
+[preset.installers]
+enabled = true
+extension = [
+    "exe", "msi", "msix", "apk", "deb", "rpm", "pkg", "appimage"
+]
+relative_path = "installers"
+absolute_path = "~/Installers"
+
+
+# ----------------------------------------------
+# Code and configuration
+[preset.code]
+enabled = true
+extension = [
+    "c", "h", "cpp", "hpp", "cc", "hh", "rs", "go", "py", "rb",
+    "js", "jsx", "ts", "tsx", "mjs", "cjs",
+    "java", "kt", "kts", "swift", "php", "cs", "scala",
+    "sh", "bash", "zsh", "fish", "ps1", "psm1", "bat", "cmd", "pl",
+    "sql", "r", "jl", "lua",
+    "html", "htm", "css", "scss", "less",
+    "json", "yaml", "yml", "toml", "ini", "conf", "xml",
+    "md", "rst", "adoc", "tex",
+    "ipynb", "Rmd",
+    "makefile", "cmake", "gradle", "pom", "dockerfile"
+]
+relative_path = "code"
+absolute_path = "~/Code"
+
+# Code (top-level subtypes)
+[preset.code_notebooks]
+enabled = true
+extension = [
+    "ipynb"
+]
+relative_path = "code/notebooks"
+absolute_path = "~/Code/notebooks"
+
+[preset.code_scripts]
+enabled = true
+extension = [
+    "py", "rb", "sh", "ps1", "bat", "cmd", "pl", "r", "jl", "lua"
+]
+relative_path = "code/scripts"
+absolute_path = "~/Code/scripts"
+
+# ----------------------------------------------
+# Design / Creative
+[preset.design]
+enabled = true
+extension = [
+    "psd", "ai", "xd", "indd", "idml", "sketch", "fig"
+]
+relative_path = "design"
+absolute_path = "~/Design"
+
+
+# 3D / CAD
+[preset.threed]
+enabled = true
+extension = [
+    "obj", "fbx", "stl", "ply", "step", "stp", "iges", "igs", "3ds",
+    "blend", "skp", "dae", "glb", "gltf"
+]
+relative_path = "3d"
+absolute_path = "~/3D"
+
+
+# GIS / Maps
+[preset.gis]
+enabled = true
+extension = [
+    "shp", "shx", "dbf", "prj", "geojson", "topojson", "kml", "kmz",
+    "mbtiles", "vrt", "geotiff", "tif", "tiff"
+]
+relative_path = "gis"
+absolute_path = "~/GIS"
+
+
+# Data / Databases
+[preset.data]
+enabled = true
+extension = [
+    "sqlite", "db", "sql", "dump", "dmp", "pgsql",
+    "parquet", "arrow", "feather", "orc", "avro",
+    "hdf5", "h5", "mat", "sav"
+]
+relative_path = "data"
+absolute_path = "~/Data"
+
+
+# Fonts
+[preset.fonts]
+enabled = true
+extension = [
+    "ttf", "otf", "woff", "woff2", "eot"
+]
+relative_path = "fonts"
+absolute_path = "~/Fonts"
+
+
+# Certificates / Keys
+[preset.security]
+enabled = true
+extension = [
+    "pem", "crt", "cer", "der", "pfx", "p12", "key", "csr", "asc", "gpg", "pgp", "kdbx"
+]
+relative_path = "security"
+absolute_path = "~/Security"
+
+
+# Torrents
+[preset.torrents]
+enabled = true
+extension = [
+    "torrent"
+]
+relative_path = "torrents"
+absolute_path = "~/Torrents"
+
+
+# Backups / Temp / Logs
+[preset.system]
+enabled = true
+extension = [
+    "bak", "backup", "old", "tmp", "temp", "log"
+]
+relative_path = "system"
+absolute_path = "~/System"
+
+
+# Virtual machines / Containers
+[preset.vm]
+enabled = true
+extension = [
+    "ova", "ovf", "vdi", "vmdk", "vhd", "vhdx", "qcow2", "box"
+]
+relative_path = "vm"
+absolute_path = "~/VMs"
+
+
+# Firmware / ROMs
+[preset.roms]
+enabled = true
+extension = [
+    "bin", "rom", "img", "ips", "xci", "nsp", "cia"
+]
+relative_path = "roms"
+absolute_path = "~/ROMs"

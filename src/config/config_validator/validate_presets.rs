@@ -1,7 +1,10 @@
 // TODO: if two presets with same extension are enabled, they should have different relative_path and absolute_path
 // TODO: implement a precedence system where the top most preset has the highest precedence
 // TODO: implement a duplicate entry error for duplicate keys in a preset
+// TODO: support for nested presets like [preset.docs.txt] for txt in /documents/txt
 // TODO: implement a duplicate entry error for duplicate extensions in the same preset
+// TODO: A global "*" catch-all extension support to sort files which don't match any presets into a misc folder
+// TODO: support for recursive option which would recursively sort files inside a target directory
 use std::collections::HashMap;
 use toml::Value;
 use super::ValidationError;
