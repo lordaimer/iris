@@ -10,6 +10,7 @@ use std::path::Path;
 use std::{fs, io};
 use std::path::PathBuf;
 use std::collections::{HashSet, HashMap};
+use colored::Colorize;
 
 // directory traversal
 use walkdir::WalkDir;
@@ -89,10 +90,9 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
         }
     }
 
-    println!("Sorting files in target location: {}", target.display());
+    println!("Sorting files in: {}", target.display());
 
     let mode: &Mode = &config.general.mode;
-    println!("Mode: {:?}", mode);
 
     // Pre-build a HashMap for efficient extension-to-preset lookups.
     // The first preset encountered for a given extension takes precedence.
@@ -102,11 +102,6 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
             ext_map.entry(ext.to_lowercase()).or_insert(preset);
         }
     }
-
-    println!(
-        "Extension map created with {} unique entries.",
-        ext_map.len()
-    );
 
     // Phase 1: walk and plan moves (deterministic, single-threaded)
     let mut planned_moves: Vec<(PathBuf, PathBuf)> = Vec::new();
@@ -179,17 +174,66 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
         }
     }
 
-    // Phase 3: execute moves in parallel using rayon
-    planned_moves.par_iter().for_each(|(src, dst)| {
-        match safe_move(src, dst) {
+    // Phase 3: execute moves in parallel using rayon and collect results
+    let move_results: Vec<(PathBuf, PathBuf, Result<(), String>)> = planned_moves
+        .par_iter()
+        .map(|(src, dst)| {
+            let result = safe_move(src, dst);
+            (src.to_path_buf(), dst.to_path_buf(), result)
+        })
+        .collect();
+
+    // Phase 4: group and display results by destination
+    let mut successful_moves: HashMap<PathBuf, Vec<(PathBuf, PathBuf)>> = HashMap::new();
+    let mut failed_moves: Vec<(PathBuf, PathBuf, String)> = Vec::new();
+    let mut total_moved = 0;
+
+    // Group successful moves by destination directory
+    for (src, dst, result) in move_results {
+        match result {
             Ok(()) => {
-                println!("Moved '{}' -> '{}'", src.display(), dst.display());
+                let dest_dir = dst.parent().unwrap_or_else(|| Path::new(".")).to_path_buf();
+                successful_moves
+                    .entry(dest_dir)
+                    .or_insert_with(Vec::new)
+                    .push((src, dst));
+                total_moved += 1;
             }
             Err(e) => {
-                eprintln!("Failed to move '{}' -> '{}': {}", src.display(), dst.display(), e);
+                failed_moves.push((src, dst, e));
             }
         }
-    });
+    }
+
+    // Display grouped successful moves
+    if !successful_moves.is_empty() {
+        let mut dest_dirs: Vec<_> = successful_moves.keys().collect();
+        dest_dirs.sort();
+
+        for dest_dir in dest_dirs {
+            let files = &successful_moves[dest_dir];
+            println!("{}", format!("  → {}", dest_dir.display()).bright_cyan());
+            
+            for (src, _) in files {
+                if let Some(file_name) = src.file_name() {
+                    println!("{}", format!("    {}", file_name.to_string_lossy()).white());
+                }
+            }
+            println!();
+        }
+    }
+
+    // Display failed moves
+    if !failed_moves.is_empty() {
+        for (src, dst, err) in &failed_moves {
+            eprintln!("{}", format!("Failed to move '{}' -> '{}': {}", src.display(), dst.display(), err).red());
+        }
+    }
+
+    // Display summary
+    if total_moved > 0 {
+        println!("{}", format!("Summary: {} file{} moved", total_moved, if total_moved == 1 { "" } else { "s" }).green());
+    }
 
     Ok(())
 }

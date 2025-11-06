@@ -64,10 +64,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Sort { path } => {
             // parse the config
             let value = match config_parser::parse_config() {
-                Ok(v) => {
-                    println!("{}", "Successfully parsed config file, validating...".green());
-                    v
-                },
+                Ok(v) => v,
                 Err(e) => {
                     eprintln!("failed to parse config file. error: {}", e);
                     std::process::exit(1);
@@ -80,8 +77,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::process::exit(1);
             }
 
-            println!("{}", "Config file is valid".green());
-
             // process the config into IrisConfig struct
             let iris_config = match IrisConfig::from_value(&value) {
                 Ok(config) => config,
@@ -90,7 +85,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     std::process::exit(1);
                 }
             };
-            println!("{}", "Config processed successfully".green());
 
             // resolve the actual target path based on config and CLI args
             let target_path = match target_resolver::resolve_target(&iris_config, path.as_ref()) {
