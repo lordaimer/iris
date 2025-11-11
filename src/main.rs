@@ -5,7 +5,13 @@ mod core;
 mod platform;
 
 use clap::Parser;
-use cli::cli_parser::{Cli, Commands, ConfigAction, ContextAction};
+
+use cli::cli_parser::ConfigAction;
+
+#[cfg(target_os = "windows")]
+use cli::cli_parser::ContextAction;
+
+use cli::cli_parser::{Cli, Commands};
 use colored::Colorize;
 use config::{config_init, config_edit, config_reset, config_show, config_parser, config_validator, config_processor};
 use config_processor::IrisConfig;

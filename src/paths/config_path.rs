@@ -10,8 +10,10 @@ fn get_config_dir() -> PathBuf {
         dirs::config_dir().expect("Cannot determine config directory on Linux")
     } else if cfg!(target_os = "macos") {
         dirs::config_dir().expect("Cannot determine config directory on macOS")
+    } else if cfg!(target_os = "android") {
+        PathBuf::from("/data/data/com.termux/files/home/.config")
     } else {
-        panic!("Unsupported OS");
+        panic!("Unsupported Environment");
     };
 
     if cfg!(target_os = "windows") {
