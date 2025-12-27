@@ -1,5 +1,5 @@
-use std::path::PathBuf;
 use crate::paths::config_path::get_config_path;
+use std::path::PathBuf;
 
 pub fn resolve_path(path_str: &str) -> Option<PathBuf> {
     if path_str.trim().is_empty() {
@@ -20,7 +20,15 @@ pub fn resolve_path(path_str: &str) -> Option<PathBuf> {
     #[cfg(windows)]
     {
         use std::path::MAIN_SEPARATOR;
-        let s = path.to_string_lossy().replace(['/', '\\'], &MAIN_SEPARATOR.to_string());
+        let s = path
+            .to_string_lossy()
+            .replace(['/', '\\'], &MAIN_SEPARATOR.to_string());
+        path = PathBuf::from(s);
+    }
+
+    #[cfg(not(windows))]
+    {
+        let s = path.to_string_lossy().replace('\\', "/");
         path = PathBuf::from(s);
     }
 
