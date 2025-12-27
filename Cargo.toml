@@ -1,9 +1,5 @@
 [package]
 name = "iris-cli"
-
-[[bin]]
-name = "iris"
-path = "src/main.rs"
 version = "1.1.1"
 edition = "2021"
 authors = ["lordaimer <araneaimer@gmail.com>"]
@@ -13,7 +9,11 @@ repository = "https://github.com/lordaimer/iris"
 readme = "README.md"
 homepage = "https://github.com/lordaimer/iris"
 keywords = ["cli", "organizer", "automation", "filesystem", "sorter"]
-categories = ["command-line-utilities", "filesystem", "productivity"]
+categories = ["command-line-utilities", "filesystem"]
+
+[[bin]]
+name = "iris"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive", "cargo"] }
@@ -37,4 +37,3 @@ winreg = "0.52.0"
 
 [build-dependencies]
 winres = "0.1.12"
-

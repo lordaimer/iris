@@ -19,9 +19,9 @@ Iris helps you sort and organize your messy folders automatically using defined 
 ### Download Binary
 Download the latest release for your platform from the [Releases Page](https://github.com/lordaimer/iris/releases).
 
-### Build from Source
+### From Crates.io
 ```bash
-cargo install --git https://github.com/lordaimer/iris
+cargo install iris-cli
 ```
 
 ## Usage
