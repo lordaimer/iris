@@ -1,78 +1,58 @@
-# Iris
+<h1>Iris</h1>
+<p>
+    <a href="https://github.com/lordaimer/iris/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/lordaimer/iris?color=greenlight&label=latest%20release"></a>
+    <a href="https://github.com/lordaimer/iris/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/lordaimer/iris/ci.yml?label=tests"></a>
+</p>
 
-A fast, minimal file organizer built with Rust.  
-Sort, clean, watch, and archive your files with simple commands.
+A fast, minimal, config-driven file organizer built with Rust.  
+Iris helps you sort and organize your messy folders automatically using defined rules.
 
-## Overview
+## ✨ Features
+ - ⚡ **Fast**: Built in Rust for high performance.
+ - 💻 **Multiplatform**: Runs on Windows, Linux, and macOS.
+ - 🖱️ **Context Menu**: Right-click "Sort with Iris" support on Windows.
+ - 📁 **Config Driven**: Customize behavior with a simple `iris.toml` file.
+ - 🤖 **Smart Presets**: Comes with sensible defaults for common file types.
 
-Iris is a command-line tool that organizes your files automatically.  
-It sorts folders by file type or time based sort options, removes empty files or directories, archives old data, and can run in the background to keep everything tidy in real time.
+## 🚀 Installation
 
-### Iris in Action
+### Download Binary
+Download the latest release for your platform from the [Releases Page](https://github.com/lordaimer/iris/releases).
 
-#### Before
-```
-/home/user/Downloads/
-├── img_20230515_140322.jpg
-├── vacation_plan.docx
-├── budget2023.xlsx
-├── meeting_notes.txt
-├── recipe_chocolate_cake.pdf
-├── movie_night.mp4
-├── movie (1).mp4
-├── Something in The Way.mp3
-├── installer.exe
-├── app-release.apk
-└── project_notes/
-    └── notes.docx
-
-```
-#### After
-
-```
-/home/user/
-├── Documents/
-│   ├── excel/
-│   │   └── budget2023.xlsx
-│   ├── word/
-│   │   └── vacation_plan.docx
-│   ├── pdf/
-│   │   └── recipe_chocolate_cake.pdf
-│   └── other/
-│       └── meeting_notes.txt
-├── Pictures/
-│   └── img_20230515_140322.jpg
-├── Videos/
-│   └── movie_night.mp4
-├── Media/
-│   ├── Music/
-│   │   └── Nirvana/
-│   │       └── Something.In.The.Way.mp3
-│   └── Movies/
-│       └── Iron.Man.2008/
-│           └── Iron.Man.2008.mp4
-├── Applications/
-│   ├── windows/
-│   │   └── installer.exe
-│   └── android/
-│       └── app-release.apk
-└── Downloads/
-    └── project_notes/
-        └── notes.docx
-
-14 directories, 11 files
+### Build from Source
+```bash
+cargo install --git https://github.com/lordaimer/iris
 ```
 
-### Core Features
+## 📖 Usage
 
-- **Smart Sorting** — Organize images, videos, documents, movies, music, and more.  
-- **Watchdog** — Monitor folders and auto-sort new files.  
-- **Cleanup** — Remove empty files or folders, clean up temp files and system cache.  
-- **Archive** — Move old files into an archive folder.  
-- **Undo / Redo** — Roll back or reapply sort operations.  
-- **Configurable** — Simple config file for full control.  
-- **Dry Run** — Preview actions before applying changes.  
-- **Fast & Lightweight** — Built in Rust for performance.
+### Basic Sorting
+To sort a directory using default settings:
+```bash
+iris sort /path/to/folder
+```
 
-> Warning
-> Do not run this in a codebase! obviously it will mess it up. this is primarily intended for keeping your huge downloads folder organized
+### Windows Context Menu
+On Windows, you can add Iris to the right-click menu:
+```powershell
+iris context install
+```
+Now simply right-click any folder background and select **"Sort with Iris"**.
+
+## ⚙️ Configuration
+Iris automatically creates a default configuration file at:
+- **Windows**: `%APPDATA%\iris\iris.toml`
+- **Linux/macOS**: `~/.config/iris/iris.toml`
+
+Can be customized to define where files go based on extensions or patterns.
+```bash
+iris config edit
+```
+
+```toml
+[preset.images]
+enabled = true
+# Sorts .jpg and .png into "Pictures" folder
+extension = ["jpg", "png"]
+relative_path = "Pictures"
+```
