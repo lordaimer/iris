@@ -2,13 +2,16 @@
 #[cfg(target_os = "windows")]
 use anyhow::{Context, Result};
 #[cfg(target_os = "windows")]
-use std::path::PathBuf;
-#[cfg(target_os = "windows")]
 use std::fs;
+#[cfg(target_os = "windows")]
+use std::path::PathBuf;
 #[cfg(target_os = "windows")]
 use winreg::enums::*;
 #[cfg(target_os = "windows")]
 use winreg::RegKey;
+
+// Embed the icon (relative to this file: ../../../assets/icon/iris.ico)
+const ICON_DATA: &[u8] = include_bytes!("../../../assets/icon/iris.ico");
 
 #[cfg(target_os = "windows")]
 fn get_current_exe_path() -> Result<PathBuf> {
@@ -17,7 +20,7 @@ fn get_current_exe_path() -> Result<PathBuf> {
 }
 
 #[cfg(target_os = "windows")]
-fn write_directory_menu(installed_exe: &str) -> Result<()> {
+fn write_directory_menu(installed_exe: &str, icon_path: &str) -> Result<()> {
     // HKCU\Software\Classes\Directory\shell\Sort with Iris\command
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let classes = hkcu
@@ -29,7 +32,7 @@ fn write_directory_menu(installed_exe: &str) -> Result<()> {
         .context("failed to create context menu key for Directory")?;
 
     shell_key.set_value("MUIVerb", &"Sort with Iris").ok();
-    shell_key.set_value("Icon", &installed_exe).ok();
+    shell_key.set_value("Icon", &icon_path).ok();
 
     let (cmd_key, _) = shell_key
         .create_subkey("command")
@@ -42,7 +45,7 @@ fn write_directory_menu(installed_exe: &str) -> Result<()> {
 }
 
 #[cfg(target_os = "windows")]
-fn write_directory_background_menu(installed_exe: &str) -> Result<()> {
+fn write_directory_background_menu(installed_exe: &str, icon_path: &str) -> Result<()> {
     // HKCU\Software\Classes\Directory\Background\shell\Sort with Iris\command
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let classes = hkcu
@@ -54,7 +57,7 @@ fn write_directory_background_menu(installed_exe: &str) -> Result<()> {
         .context("failed to create context menu key for Directory Background")?;
 
     shell_key.set_value("MUIVerb", &"Sort with Iris").ok();
-    shell_key.set_value("Icon", &installed_exe).ok();
+    shell_key.set_value("Icon", &icon_path).ok();
 
     let (cmd_key, _) = shell_key
         .create_subkey("command")
@@ -81,6 +84,16 @@ fn delete_tree_if_exists(root: &RegKey, path: &str) -> Result<()> {
 }
 
 #[cfg(target_os = "windows")]
+fn notify_icon_change() {
+    // Force icon cache refresh by calling ie4uinit.exe
+    // This is a known hack to refresh the icon cache on Windows without restarting Explorer
+    // ie4uinit.exe -show is used on Windows 10/11
+    let _ = std::process::Command::new("ie4uinit.exe")
+        .arg("-show")
+        .spawn();
+}
+
+#[cfg(target_os = "windows")]
 pub fn install_context_menu() -> Result<()> {
     // Determine destination: %APPDATA%/Iris/iris.exe
     let current_exe = get_current_exe_path()?;
@@ -92,12 +105,29 @@ pub fn install_context_menu() -> Result<()> {
         // Replace existing file
         let _ = fs::remove_file(&installed_exe_path);
     }
-    fs::copy(&current_exe, &installed_exe_path)
-        .with_context(|| format!("failed to copy iris.exe to {}", installed_exe_path.display()))?;
+    fs::copy(&current_exe, &installed_exe_path).with_context(|| {
+        format!(
+            "failed to copy iris.exe to {}",
+            installed_exe_path.display()
+        )
+    })?;
+
+    // Write the icon file
+    let installed_icon_path = iris_dir.join("iris.ico");
+    fs::write(&installed_icon_path, ICON_DATA).with_context(|| {
+        format!(
+            "failed to write iris.ico to {}",
+            installed_icon_path.display()
+        )
+    })?;
 
     let installed_exe = installed_exe_path.to_string_lossy().to_string();
-    write_directory_menu(&installed_exe)?;
-    write_directory_background_menu(&installed_exe)?;
+    let installed_icon = installed_icon_path.to_string_lossy().to_string();
+
+    write_directory_menu(&installed_exe, &installed_icon)?;
+    write_directory_background_menu(&installed_exe, &installed_icon)?;
+
+    notify_icon_change();
     Ok(())
 }
 
@@ -112,16 +142,26 @@ pub fn uninstall_context_menu() -> Result<()> {
     delete_tree_if_exists(&classes, "Directory\\Background\\shell\\Sort with Iris")?;
     // Remove installed executable from %APPDATA%/Iris
     if let Some(data_dir) = dirs::data_dir() {
-        let installed_exe_path = data_dir.join("Iris").join("iris.exe");
+        let iris_dir = data_dir.join("Iris");
+        let installed_exe_path = iris_dir.join("iris.exe");
         if installed_exe_path.exists() {
             let _ = fs::remove_file(installed_exe_path);
         }
+        let installed_icon_path = iris_dir.join("iris.ico");
+        if installed_icon_path.exists() {
+            let _ = fs::remove_file(installed_icon_path);
+        }
     }
+    notify_icon_change();
     Ok(())
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn install_context_menu() -> Result<()> { Err(anyhow::anyhow!("context menu is only supported on Windows")) }
+pub fn install_context_menu() -> Result<()> {
+    Err(anyhow::anyhow!("context menu is only supported on Windows"))
+}
 
 #[cfg(not(target_os = "windows"))]
-pub fn uninstall_context_menu() -> Result<()> { Err(anyhow::anyhow!("context menu is only supported on Windows")) }
+pub fn uninstall_context_menu() -> Result<()> {
+    Err(anyhow::anyhow!("context menu is only supported on Windows"))
+}
