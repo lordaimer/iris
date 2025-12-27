@@ -27,22 +27,13 @@ pub fn validate_presets(value: &Value) -> Result<(), ValidationError> {
         });
     }
 
-    // New: check if at least one preset is enabled
-    let has_enabled = presets.iter().any(|(_, v)| {
-        v.as_table()
-            .and_then(|t| t.get("enabled"))
-            .and_then(|e| e.as_bool())
-            .unwrap_or(false)
-    });
-    if !has_enabled {
-        return Err(ValidationError::NoEnabledPresets);
-    }
-
     let mut allowed_entries: HashMap<&str, (bool, Option<Vec<&str>>)> = HashMap::new();
-    allowed_entries.insert("enabled", (true, Some(vec!["true", "false"])));
+    allowed_entries.insert("enabled", (true, None));
     allowed_entries.insert("extension", (true, None));
     allowed_entries.insert("relative_path", (true, None));
     allowed_entries.insert("absolute_path", (true, None));
+
+    let mut has_enabled = false;
 
     // iterate through each preset like [preset.docs]
     for (preset_name, preset_value) in presets {
@@ -67,53 +58,53 @@ pub fn validate_presets(value: &Value) -> Result<(), ValidationError> {
                 });
             }
 
-            let (_, valid) = &allowed_entries[key.as_str()];
-
-            if let Some(valid) = valid {
-                if let Value::String(s) = value {
-                    if !valid.contains(&s.as_str()) {
+            // strict type validation
+            match key.as_str() {
+                "enabled" => {
+                    if let Value::Boolean(b) = value {
+                        if *b {
+                            has_enabled = true;
+                        }
+                    } else {
                         return Err(ValidationError::InvalidValue {
                             key: key.clone(),
-                            value: s.clone(),
-                        });
-                    }
-                } else if let Value::Boolean(b) = value {
-                    let bool_str = if *b { "true" } else { "false" };
-                    if !valid.contains(&bool_str) {
-                        return Err(ValidationError::InvalidValue {
-                            key: key.clone(),
-                            value: bool_str.to_string(),
+                            value: value.to_string(),
                         });
                     }
                 }
-            }
-
-            if key == "extension" {
-                if !value.is_array() {
-                    return Err(ValidationError::InvalidValue {
-                        key: key.clone(),
-                        value: "must be an array".to_string(),
-                    });
-                }
-
-                // check array is non-empty and contains only strings
-                if let Value::Array(arr) = value {
-                    if arr.is_empty() {
-                        return Err(ValidationError::InvalidValue {
-                            key: key.clone(),
-                            value: "array cannot be empty".to_string(),
-                        });
-                    }
-
-                    for item in arr {
-                        if !item.is_str() {
+                "extension" => {
+                    if let Value::Array(arr) = value {
+                        if arr.is_empty() {
                             return Err(ValidationError::InvalidValue {
                                 key: key.clone(),
-                                value: "array must contain only strings".to_string(),
+                                value: "array cannot be empty".to_string(),
                             });
                         }
+
+                        for item in arr {
+                            if !item.is_str() {
+                                return Err(ValidationError::InvalidValue {
+                                    key: key.clone(),
+                                    value: "array must contain only strings".to_string(),
+                                });
+                            }
+                        }
+                    } else {
+                        return Err(ValidationError::InvalidValue {
+                            key: key.clone(),
+                            value: "must be an array".to_string(),
+                        });
                     }
                 }
+                "relative_path" | "absolute_path" => {
+                    if !value.is_str() {
+                        return Err(ValidationError::InvalidValue {
+                            key: key.clone(),
+                            value: value.to_string(),
+                        });
+                    }
+                }
+                _ => {}
             }
         }
 
@@ -126,6 +117,11 @@ pub fn validate_presets(value: &Value) -> Result<(), ValidationError> {
                 });
             }
         }
+    }
+
+    // check if at least one preset is enabled
+    if !has_enabled {
+        return Err(ValidationError::NoEnabledPresets);
     }
 
     Ok(())
