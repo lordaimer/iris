@@ -1,7 +1,7 @@
 /// Resolve the path to target based on the target field in config file
-use crate::config::config_processor::{Target, IrisConfig};
-use std::path::PathBuf;
+use crate::config::config_processor::{IrisConfig, Target};
 use std::env;
+use std::path::PathBuf;
 
 use crate::paths::path_resolve::resolve_path_strict;
 
@@ -18,14 +18,17 @@ impl std::fmt::Display for TargetResolutionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             TargetResolutionError::PathRequiredButNotProvided => {
-                write!(f, "target is set to 'required' in config. you must provide a path")
-            },
+                write!(
+                    f,
+                    "target is set to 'required' in config. you must provide a path"
+                )
+            }
             TargetResolutionError::ProvidedPathInvalid => {
                 write!(f, "provided path doesn't exist or is invalid")
             }
             TargetResolutionError::FailedToGetCurrentDir => {
                 write!(f, "failed to get current working directory")
-            },
+            }
             TargetResolutionError::FailedToGetDownloadsDir => {
                 write!(f, "failed to get downloads directory")
             }
@@ -42,14 +45,15 @@ fn try_resolve(path: &str) -> Result<PathBuf, TargetResolutionError> {
 
 #[allow(dead_code)]
 /// Resolves the actual target path based on config and CLI arguments
-pub fn resolve_target(config: &IrisConfig, cli_path: Option<&String>) -> Result<PathBuf, TargetResolutionError> {
+pub fn resolve_target(
+    config: &IrisConfig,
+    cli_path: Option<&String>,
+) -> Result<PathBuf, TargetResolutionError> {
     match &config.general.target {
-        Some(Target::Required) | None => {
-            cli_path.map_or(
-                Err(TargetResolutionError::PathRequiredButNotProvided),
-                |p| try_resolve(p),
-            )
-        }
+        Some(Target::Required) | None => cli_path.map_or(
+            Err(TargetResolutionError::PathRequiredButNotProvided),
+            |p| try_resolve(p),
+        ),
         Some(Target::Downloads) => {
             if let Some(p) = cli_path {
                 return try_resolve(p);
@@ -61,7 +65,8 @@ pub fn resolve_target(config: &IrisConfig, cli_path: Option<&String>) -> Result<
             if let Some(p) = cli_path {
                 return try_resolve(p);
             }
-            let cwd = env::current_dir().map_err(|_| TargetResolutionError::FailedToGetCurrentDir)?;
+            let cwd =
+                env::current_dir().map_err(|_| TargetResolutionError::FailedToGetCurrentDir)?;
             try_resolve(cwd.to_string_lossy().as_ref())
         }
     }
@@ -71,8 +76,8 @@ pub fn resolve_target(config: &IrisConfig, cli_path: Option<&String>) -> Result<
 mod tests {
     use super::*;
     use crate::config::config_processor::{GeneralConfig, Mode};
+    use std::{env, fs};
     use tempfile::tempdir;
-    use std::{fs, env};
 
     fn create_test_config(target: Option<Target>) -> IrisConfig {
         IrisConfig {
@@ -110,6 +115,12 @@ mod tests {
 
     #[test]
     fn test_downloads_without_path() {
+        // Skip test if downloads dir is not available (common in CI/server environments)
+        if dirs::download_dir().is_none() {
+            println!("Skipping test_downloads_without_path: no downloads directory found");
+            return;
+        }
+
         let config = create_test_config(Some(Target::Downloads));
         let result = resolve_target(&config, None);
         assert!(result.is_ok());

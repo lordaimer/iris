@@ -7,14 +7,14 @@
 A fast, minimal, config-driven file organizer built with Rust.  
 Iris helps you sort and organize your messy folders automatically using defined rules.
 
-## ✨ Features
+## Features
  - ⚡ **Fast**: Built in Rust for high performance.
  - 💻 **Multiplatform**: Runs on Windows, Linux, and macOS.
  - 🖱️ **Context Menu**: Right-click "Sort with Iris" support on Windows.
  - 📁 **Config Driven**: Customize behavior with a simple `iris.toml` file.
  - 🤖 **Smart Presets**: Comes with sensible defaults for common file types.
 
-## 🚀 Installation
+## Installation
 
 ### Download Binary
 Download the latest release for your platform from the [Releases Page](https://github.com/lordaimer/iris/releases).
@@ -24,7 +24,7 @@ Download the latest release for your platform from the [Releases Page](https://g
 cargo install --git https://github.com/lordaimer/iris
 ```
 
-## 📖 Usage
+## Usage
 
 ### Basic Sorting
 To sort a directory using default settings:
@@ -39,7 +39,7 @@ iris context install
 ```
 Now simply right-click any folder background and select **"Sort with Iris"**.
 
-## ⚙️ Configuration
+## Configuration
 Iris automatically creates a default configuration file at:
 - **Windows**: `%APPDATA%\iris\iris.toml`
 - **Linux/macOS**: `~/.config/iris/iris.toml`
