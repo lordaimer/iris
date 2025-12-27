@@ -5,11 +5,11 @@
 // TODO: Skip hashing for small files (less than 1MB) or when rename succeeds
 // TODO: in the copy fallback add a fast-verify mode: first compare size; if equal then hash only a small head + tail chunk for large files. then full hash it if that mismatches
 // TODO: add a concurrency limit (thread pool size) configurable through config file as well as cli override
-use std::path::Path;
-use std::{fs, io};
-use std::path::PathBuf;
-use std::collections::{HashSet, HashMap};
 use colored::Colorize;
+use std::collections::{HashMap, HashSet};
+use std::path::Path;
+use std::path::PathBuf;
+use std::{fs, io};
 
 // directory traversal
 use walkdir::WalkDir;
@@ -36,35 +36,12 @@ const PROTECTED_PATHS: &[&str] = &[
 
 #[cfg(target_os = "linux")]
 const PROTECTED_PATHS: &[&str] = &[
-    "/",
-    "/bin",
-    "/boot",
-    "/dev",
-    "/etc",
-    "/lib",
-    "/lib32",
-    "/lib64",
-    "/libx32",
-    "/media",
-    "/mnt",
-    "/opt",
-    "/proc",
-    "/root",
-    "/run",
-    "/sbin",
-    "/srv",
-    "/sys",
-    "/usr",
-    "/var",
+    "/", "/bin", "/boot", "/dev", "/etc", "/lib", "/lib32", "/lib64", "/libx32", "/media", "/mnt",
+    "/opt", "/proc", "/root", "/run", "/sbin", "/srv", "/sys", "/usr", "/var",
 ];
 
 #[cfg(any(target_os = "linux", target_os = "android"))]
-const PROTECTED_PATHS: &[&str] = &[
-    "/system",
-    "/vendor",
-    "/proc",
-    "/sys",
-];
+const PROTECTED_PATHS: &[&str] = &["/system", "/vendor", "/proc", "/sys"];
 
 #[cfg(target_os = "macos")]
 const PROTECTED_PATHS: &[&str] = &[
@@ -93,7 +70,8 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
             return Err(format!(
                 "Operation aborted. '{}' is a protected system path.",
                 target.display()
-            ).into());
+            )
+            .into());
         }
     }
 
@@ -110,6 +88,34 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
         }
     }
 
+    // Find the "dirs" preset
+    let dirs_preset = config
+        .presets
+        .iter()
+        .find(|p| p.name == "dirs" && p.enabled);
+
+    if dirs_preset.is_some() {
+        println!("{}", "Folder sorting enabled.".bright_green());
+    }
+
+    // Phase 0: Identify protected directory names to prevent moving Iris output folders
+    // (e.g., prevent moving "code" into "folders/code" if [preset.code] is active and uses "code" as path)
+    let mut protected_names: HashSet<String> = HashSet::new();
+    if *mode == Mode::Relative {
+        for preset in config.presets.iter().filter(|p| p.enabled) {
+            if let Some(rel_path) = &preset.relative_path {
+                // Get the first component of the relative path
+                if let Some(first_comp) = rel_path.components().next() {
+                    if let std::path::Component::Normal(c) = first_comp {
+                        if let Some(s) = c.to_str() {
+                            protected_names.insert(s.to_lowercase());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Phase 1: walk and plan moves (deterministic, single-threaded)
     let mut planned_moves: Vec<(PathBuf, PathBuf)> = Vec::new();
     let mut reserved_dests: HashSet<PathBuf> = HashSet::new();
@@ -123,12 +129,63 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
             }
         };
 
-        // Skip directories. this should later be handled by the recursive flag in the config file
-        if !entry.file_type().is_file() {
+        let path = entry.path();
+        let is_dir = entry.file_type().is_dir();
+
+        // Handle directories
+        if is_dir {
+            if let Some(preset) = dirs_preset {
+                // Check if this directory is a protected preset output folder
+                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                    if protected_names.contains(&name.to_lowercase()) {
+                        // It matches a preset path, so skip it
+                        continue;
+                    }
+                }
+
+                // Resolve the destination base path for the preset
+                match dest_base_resolver::get_dest_base(&target, preset, mode.clone()) {
+                    Ok(dest_base) => {
+                        // Guard: destination base should not be a dangerous system path
+                        if PROTECTED_PATHS.iter().any(|p| Path::new(p) == dest_base) {
+                            eprintln!(
+                                "Refusing to sort into protected path: {}",
+                                dest_base.display()
+                            );
+                            continue;
+                        }
+
+                        // Skip if the directory IS the destination folder
+                        if path == dest_base {
+                            continue;
+                        }
+
+                        // Compute destination folder path
+                        let folder_name = match path.file_name() {
+                            Some(n) => n.to_owned(),
+                            None => continue,
+                        };
+                        let desired = dest_base.join(folder_name);
+                        let dest_path = reserve_unique_destination(&desired, &mut reserved_dests);
+
+                        // If source and destination are identical, skip
+                        if path == dest_path {
+                            continue;
+                        }
+
+                        planned_moves.push((path.to_path_buf(), dest_path));
+                    }
+                    Err(e) => eprintln!(
+                        "Could not determine sort destination for folder '{}': {}",
+                        path.display(),
+                        e
+                    ),
+                }
+            }
             continue;
         }
 
-        let path = entry.path();
+        // Handle files
         // Get the extension of the file (lowercased)
         let extension = match path.extension().and_then(|s| s.to_str()) {
             Some(ext) => ext.to_lowercase(),
@@ -164,7 +221,11 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
 
                     planned_moves.push((path.to_path_buf(), dest_path));
                 }
-                Err(e) => eprintln!("Could not determine sort destination for '{}': {}", path.display(), e),
+                Err(e) => eprintln!(
+                    "Could not determine sort destination for '{}': {}",
+                    path.display(),
+                    e
+                ),
             }
         }
     }
@@ -172,12 +233,18 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
     // Phase 2: pre-create all destination directories (deduped with HashSet)
     let mut unique_dirs: HashSet<PathBuf> = HashSet::new();
     for (_, dst) in &planned_moves {
-        if let Some(parent) = dst.parent() { unique_dirs.insert(parent.to_path_buf()); }
+        if let Some(parent) = dst.parent() {
+            unique_dirs.insert(parent.to_path_buf());
+        }
     }
     // Create all the destination directories
     for dir in unique_dirs {
         if let Err(e) = fs::create_dir_all(&dir) {
-            eprintln!("Failed to create destination directory '{}': {}", dir.display(), e);
+            eprintln!(
+                "Failed to create destination directory '{}': {}",
+                dir.display(),
+                e
+            );
         }
     }
 
@@ -220,7 +287,7 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
         for dest_dir in dest_dirs {
             let files = &successful_moves[dest_dir];
             println!("{}", format!("  → {}", dest_dir.display()).bright_cyan());
-            
+
             for (src, _) in files {
                 if let Some(file_name) = src.file_name() {
                     println!("{}", format!("    {}", file_name.to_string_lossy()).white());
@@ -233,13 +300,30 @@ pub fn sort(target: &Path, config: &IrisConfig) -> Result<(), Box<dyn std::error
     // Display failed moves
     if !failed_moves.is_empty() {
         for (src, dst, err) in &failed_moves {
-            eprintln!("{}", format!("Failed to move '{}' -> '{}': {}", src.display(), dst.display(), err).red());
+            eprintln!(
+                "{}",
+                format!(
+                    "Failed to move '{}' -> '{}': {}",
+                    src.display(),
+                    dst.display(),
+                    err
+                )
+                .red()
+            );
         }
     }
 
     // Display summary
     if total_moved > 0 {
-        println!("{}", format!("Summary: {} file{} moved", total_moved, if total_moved == 1 { "" } else { "s" }).green());
+        println!(
+            "{}",
+            format!(
+                "Summary: {} file{} moved",
+                total_moved,
+                if total_moved == 1 { "" } else { "s" }
+            )
+            .green()
+        );
     }
 
     Ok(())
@@ -269,33 +353,69 @@ fn reserve_unique_destination(desired: &Path, reserved: &mut HashSet<PathBuf>) -
             reserved.insert(candidate.clone());
             return candidate;
         }
-        if i == usize::MAX { break; }
+        if i == usize::MAX {
+            break;
+        }
     }
     // Fallback to desired; record it
     reserved.insert(desired.to_path_buf());
     desired.to_path_buf()
 }
 
-/// Safely move the source file to the destination file
+/// Safely move the source file OR directory to the destination
 fn safe_move(src: &Path, dst: &Path) -> Result<(), String> {
-    // Try fast path: rename (atomic, same volume)
+    if src.is_dir() {
+        // Try atomic rename first
+        if fs::rename(src, dst).is_ok() {
+            return Ok(());
+        }
+        // Fallback for directories (cross-fs)
+        return copy_delete_dir(src, dst);
+    }
+
+    // File path: try fast rename
     match fs::rename(src, dst) {
         Ok(_) => return Ok(()),
-        Err(e) => {
-            // If not a cross-device error, still attempt copy fallback; log the rename failure
-            let _ = e;
-        }
+        Err(_) => {} // Fallthrough to copy fallback
     }
 
     // Fallback: copy + verify + delete
     copy_verify_delete(src, dst)
 }
 
+/// Recursively copy a directory and then delete the source
+fn copy_delete_dir(src: &Path, dst: &Path) -> Result<(), String> {
+    // Create the destination directory
+    fs::create_dir_all(dst)
+        .map_err(|e| format!("failed to create dir {}: {}", dst.display(), e))?;
+
+    for entry in WalkDir::new(src).min_depth(1) {
+        let entry = entry.map_err(|e| format!("walk error: {}", e))?;
+        let rel_path = entry
+            .path()
+            .strip_prefix(src)
+            .map_err(|e| format!("strip prefix error: {}", e))?;
+        let target_path = dst.join(rel_path);
+
+        if entry.file_type().is_dir() {
+            fs::create_dir_all(&target_path)
+                .map_err(|e| format!("failed to create dir {}: {}", target_path.display(), e))?;
+        } else {
+            fs::copy(entry.path(), &target_path)
+                .map_err(|e| format!("failed to copy file {}: {}", entry.path().display(), e))?;
+        }
+    }
+
+    // Remove source directory after successful copy
+    fs::remove_dir_all(src)
+        .map_err(|e| format!("failed to remove src dir {}: {}", src.display(), e))?;
+    Ok(())
+}
+
 /// Copy the source file to the destination file, verify the size and hash, and delete the source file
 fn copy_verify_delete(src: &Path, dst: &Path) -> Result<(), String> {
     // Perform copy
-    fs::copy(src, dst)
-        .map_err(|e| format!("copy failed: {}", e))?;
+    fs::copy(src, dst).map_err(|e| format!("copy failed: {}", e))?;
 
     // Verify size first (quick check)
     let src_meta = fs::metadata(src).map_err(|e| format!("stat src failed: {}", e))?;
@@ -321,14 +441,16 @@ fn copy_verify_delete(src: &Path, dst: &Path) -> Result<(), String> {
 
 /// Hash the file using blake3
 fn hash_file(path: &Path) -> io::Result<blake3::Hash> {
-    use std::io::{Read, BufReader};
+    use std::io::{BufReader, Read};
     let file = fs::File::open(path)?;
     let mut reader = BufReader::new(file);
     let mut hasher = blake3::Hasher::new();
     let mut buf = [0u8; 1024 * 1024];
     loop {
         let n = reader.read(&mut buf)?;
-        if n == 0 { break; }
+        if n == 0 {
+            break;
+        }
         hasher.update(&buf[..n]);
     }
     Ok(hasher.finalize())

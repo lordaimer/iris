@@ -5,18 +5,16 @@
 // TODO: implement a duplicate entry error for duplicate extensions in the same preset
 // TODO: A global "*" catch-all extension support to sort files which don't match any presets into a misc folder
 // TODO: support for recursive option which would recursively sort files inside a target directory
+use super::ValidationError;
 use std::collections::HashMap;
 use toml::Value;
-use super::ValidationError;
 
 pub fn validate_presets(value: &Value) -> Result<(), ValidationError> {
     // Check if "preset" table exists
     let presets = match value.get("preset") {
         Some(Value::Table(t)) => t,
         _ => {
-            return Err(ValidationError::MissingSection {
-                section: "presets",
-            });
+            return Err(ValidationError::MissingSection { section: "presets" });
         }
     };
 
@@ -110,6 +108,11 @@ pub fn validate_presets(value: &Value) -> Result<(), ValidationError> {
 
         // check for missing required keys
         for (allowed_key, (required, _)) in &allowed_entries {
+            // Special case: "dirs" preset does not require "extension"
+            if *allowed_key == "extension" && preset_name == "dirs" {
+                continue;
+            }
+
             if *required && !preset_table.contains_key(*allowed_key) {
                 return Err(ValidationError::MissingKey {
                     key: allowed_key.to_string(),
