@@ -40,7 +40,7 @@ const PROTECTED_PATHS: &[&str] = &[
     "/opt", "/proc", "/root", "/run", "/sbin", "/srv", "/sys", "/usr", "/var",
 ];
 
-#[cfg(any(target_os = "linux", target_os = "android"))]
+#[cfg(target_os = "android")]
 const PROTECTED_PATHS: &[&str] = &["/system", "/vendor", "/proc", "/sys"];
 
 #[cfg(target_os = "macos")]
