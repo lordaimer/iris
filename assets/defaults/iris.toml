@@ -417,7 +417,7 @@ absolute_path = "~/ROMs"
 # ----------------------------------------------
 # Directories / Folders
 [preset.dirs]
-enabled = false
+enabled = true
 # No extension field required for directories
 relative_path = "folders"
 absolute_path = "~/Folders"
