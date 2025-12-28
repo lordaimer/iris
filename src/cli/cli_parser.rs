@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand, crate_name, crate_version, crate_authors, crate_description};
+use clap::{crate_authors, crate_description, crate_name, crate_version, Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(
@@ -34,6 +34,11 @@ pub enum Commands {
         #[command(subcommand)]
         action: ContextAction,
     },
+    /// Manage shell completion
+    Completions {
+        #[command(subcommand)]
+        action: ShellCompletionAction,
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -59,6 +64,26 @@ pub enum ContextAction {
     /// Uninstall the Windows right-click menu entry
     #[command(alias = "remove")]
     Uninstall,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum ShellCompletionAction {
+    /// Automatically install shell completion
+    #[command(alias = "add")]
+    Install,
+    /// Uninstall shell completion
+    #[command(alias = "remove")]
+    Uninstall,
+    /// Print bash completion script
+    Bash,
+    /// Print zsh completion script
+    Zsh,
+    /// Print powershell completion script
+    Powershell,
+    /// Print fish completion script
+    Fish,
+    /// Print elvish completion script
+    Elvish,
 }
 
 #[cfg(test)]

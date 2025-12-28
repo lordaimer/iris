@@ -1,7 +1,7 @@
 mod cli;
-mod paths;
 mod config;
 mod core;
+mod paths;
 mod platform;
 
 use clap::Parser;
@@ -13,14 +13,17 @@ use cli::cli_parser::ContextAction;
 
 use cli::cli_parser::{Cli, Commands};
 use colored::Colorize;
-use config::{config_init, config_edit, config_reset, config_show, config_parser, config_validator, config_processor};
+use config::{
+    config_edit, config_init, config_parser, config_processor, config_reset, config_show,
+    config_validator,
+};
 use config_processor::IrisConfig;
 use core::{resolver::target_resolver, sort::sort};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Config file path
+    // config file path
     let config_path = paths::config_path::get_config_path();
-    // Check if config file path exists, if not initialize a default file
+    // check if config file path exists, if not initialize a default file
     if !config_path.exists() {
         config_init::init_defaults(&config_path)?;
     }
@@ -32,11 +35,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         args[1] = "--help".to_string();
     }
 
-    // parse args using the overridden Command
+    // parse args using the overridden command
     let cli = Cli::parse_from(&args);
 
     match &cli.command {
-        // Config commands do NOT require a valid config
+        // config commands do NOT require a valid config
         Commands::Config { action } => match action {
             ConfigAction::Show => {
                 handle_result(config_show::show_config());
@@ -44,29 +47,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ConfigAction::Edit => {
                 handle_result(config_edit::edit_config());
             }
-            ConfigAction::Reset { noconfirm} => {
+            ConfigAction::Reset { noconfirm } => {
                 handle_result(config_reset::reset_config(*noconfirm));
             }
         },
         Commands::Update => {
-            println!("Updating Iris");
-        },
+            println!("TODO");
+        }
 
         #[cfg(target_os = "windows")]
-        Commands::Context { action } => {
-            match action {
-                ContextAction::Install => {
-                    use platform::windows::context_menu::install_context_menu;
-                    handle_result(install_context_menu());
-                }
-                ContextAction::Uninstall => {
-                    use platform::windows::context_menu::uninstall_context_menu;
-                    handle_result(uninstall_context_menu());
-                }
+        Commands::Context { action } => match action {
+            ContextAction::Install => {
+                use platform::windows::context_menu::install_context_menu;
+                handle_result(install_context_menu());
+            }
+            ContextAction::Uninstall => {
+                use platform::windows::context_menu::uninstall_context_menu;
+                handle_result(uninstall_context_menu());
             }
         },
 
-        // Commands that require a valid config
+        Commands::Completions { action } => {
+            use cli::shell_completion::handle_completion;
+            handle_completion(&action);
+        }
+
+        // commands that require a valid config
         Commands::Sort { path } => {
             // parse the config
             let value = match config_parser::parse_config() {
@@ -94,7 +100,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // resolve the actual target path based on config and CLI args
             let target_path = match target_resolver::resolve_target(&iris_config, path.as_ref()) {
-                Ok(p ) => p,
+                Ok(p) => p,
                 Err(e) => {
                     eprintln!("error: {}", e);
                     std::process::exit(1);

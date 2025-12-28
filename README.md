@@ -21,6 +21,7 @@ Iris helps you sort and organize your messy folders automatically using defined 
  - 💻 **Multiplatform**: Runs on Windows, Linux, and macOS.
  - 🖱️ **Context Menu**: Right-click "Sort with Iris" support on Windows.
  - 📁 **Config Driven**: Customize behavior with a simple `iris.toml` file.
+ - 📄 **Shell Completion**: Support for shell completion scripts.
  - 🤖 **Smart Presets**: Comes with sensible defaults for common file types.
 
 <details>

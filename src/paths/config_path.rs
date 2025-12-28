@@ -1,9 +1,9 @@
-use std::path::PathBuf;
-use std::fs;
 use dirs;
+use std::fs;
+use std::path::PathBuf;
 
 /// Get platform-specific user config directory path
-fn get_config_dir() -> PathBuf {
+pub fn get_config_dir() -> PathBuf {
     let dir = if cfg!(target_os = "windows") {
         dirs::config_dir().expect("Cannot determine config directory on Windows")
     } else if cfg!(target_os = "linux") {
