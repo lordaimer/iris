@@ -24,12 +24,6 @@ Iris helps you sort and organize your messy folders automatically using defined 
  - 📄 **Shell Completion**: Support for shell completion scripts.
  - 🤖 **Smart Presets**: Comes with sensible defaults for common file types.
 
-<details>
-    <summary>
-        <b>Demo: Windows Context Menu</b>
-    </summary>
-    <video src="https://github.com/user-attachments/assets/7c366ac9-9c9a-4428-be70-1234846c1de1" controls width="100%"></video>
-</details>
 
 ## Installation
 
@@ -56,6 +50,13 @@ iris context install
 ```
 Now simply right-click any folder background and select **"Sort with Iris"**.
 
+<details>
+    <summary>
+        <b>Demo: Windows Context Menu</b>
+    </summary>
+    <video src="https://github.com/user-attachments/assets/7c366ac9-9c9a-4428-be70-1234846c1de1" controls width="100%"></video>
+</details>
+
 ## Configuration
 Iris automatically creates a default configuration file at:
 - **Windows**: `%APPDATA%\iris\iris.toml`
@@ -72,4 +73,12 @@ enabled = true
 # Sorts .jpg and .png into "Pictures" folder
 extension = ["jpg", "png"]
 relative_path = "Pictures"
+```
+
+## Shell Completion
+
+Automatically generate completion scripts for your shell. (automated install is currently supported on Windows platforms only)
+
+```bash
+iris completions install
 ```
