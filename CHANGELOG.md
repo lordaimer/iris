@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.  
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [1.3.1](https://github.com/lordaimer/iris/compare/v1.3.0...v1.3.1) - 2025-12-29
+
+### What's Changed
+v1.3.1 gates PowerShell completions install when execution policy is restrictive and adds Chocolatey package configuration and automation.
+
+### Added
+- Gate PowerShell completions install when execution policy is restrictive
+- Chocolatey package configuration and automation
+
 ## [1.3.0](https://github.com/lordiamer/iris/compare/v1.2.0...v1.3.0) - 2025-12-28
 
 ### What's New
