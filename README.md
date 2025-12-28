@@ -59,7 +59,7 @@ Now simply right-click any folder background and select **"Sort with Iris"**.
 
 ## Configuration
 Iris automatically creates a default configuration file at:
-- **Windows**: `%APPDATA%\iris\iris.toml`
+- **Windows**: `%APPDATA%\Iris\iris.toml`
 - **Linux/macOS**: `~/.config/iris/iris.toml`
 
 Can be customized to define where files go based on extensions or patterns.
@@ -77,7 +77,7 @@ relative_path = "Pictures"
 
 ## Shell Completion
 
-Automatically generate completion scripts for your shell. (automated install is currently supported on Windows platforms only)
+Automatically generate and install completion scripts for your shell. You can also generate the completion script manually and install it yourself with `iris completions <SHELL>` command.
 
 ```bash
 iris completions install

@@ -1,5 +1,22 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.  
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+
+## [1.3.0](https://github.com/lordiamer/iris/compare/v1.2.0...v1.3.0) - 2025-12-28
+
+### What's New
+v1.3.0 adds support for shell completions on unix platforms.
+
+### Added
+- support for auto-install and auto-uninstall of shell completions on unix platforms
+- create shell completion file on "~/.config/iris/completions/", source it on rc files
+- uninstall: remove source line from rc files
+- support for zsh, fish, bash
+
+### Changed
+- update README.md
+
 ## [1.2.0](https://github.com/lordaimer/iris/compare/v1.1.1...v1.2.0) - 2025-12-28
 
 ### What’s New
@@ -12,8 +29,6 @@ v1.2.0 introduces shell completion support, with automatic setup on Windows and 
 
 ### Known Issues
 - Auto-install not implemented on non-Windows platforms
-
----
 
 ## [1.1.1](https://github.com/lordaimer/iris/releases/tag/v1.1.1) - 2025-12-27
 
