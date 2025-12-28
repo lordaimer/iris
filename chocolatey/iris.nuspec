@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>iris-cli</id>
+    <version>1.3.1</version>
+    <packageSourceUrl>https://github.com/lordaimer/iris/tree/main/chocolatey</packageSourceUrl>
+    <title>Iris - Fast File Organizer</title>
+    <authors>Arane Aimer</authors>
+    <projectUrl>https://github.com/lordaimer/iris</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/lordaimer/iris/main/assets/icon/iris.ico</iconUrl>
+    <copyright>2025 Arane Aimer</copyright>
+    <licenseUrl>https://github.com/lordaimer/iris/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/lordaimer/iris</projectSourceUrl>
+    <tags>rust cli file-organizer automation filesystem sorter</tags>
+    <summary>A fast, minimal, config-driven file organizer built in Rust</summary>
+    <description>
+Iris is a blazing-fast file organizer that helps you sort and organize messy folders automatically using defined rules.
+
+## Features
+
+- **Fast**: Built in Rust for high performance
+- **Multiplatform**: Runs on Windows, Linux, and macOS
+- **Context Menu**: Right-click "Sort with Iris" support on Windows
+- **Config Driven**: Customize behavior with a simple iris.toml file
+- **Shell Completion**: Support for shell completion scripts
+- **Smart Presets**: Comes with sensible defaults for common file types
+
+## Usage
+
+Sort a directory:
+```
+iris sort C:\Downloads
+```
+
+Add Windows context menu integration:
+```
+iris context install
+```
+
+Edit configuration:
+```
+iris config edit
+```
+
+For more information, visit the [GitHub repository](https://github.com/lordaimer/iris).
+    </description>
+    <releaseNotes>https://github.com/lordaimer/iris/releases/tag/v1.3.0</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
