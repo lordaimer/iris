@@ -45,8 +45,15 @@ jobs:
         cd target/${{ matrix.target }}/release
         cp ${{ matrix.artifact_name }} ../../../${{ matrix.asset_name }}
 
+    - name: Extract Release Notes
+      shell: bash
+      run: |
+        VERSION=${GITHUB_REF_NAME#v}
+        awk -v ver="[$VERSION]" '/^## / { if (p) exit; if (index($2, ver) == 1) { p=1; next } } p' CHANGELOG.md > RELEASE_NOTES.md
+
     - name: Upload Release Asset
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
+        body_path: RELEASE_NOTES.md
         files: ${{ matrix.asset_name }}
