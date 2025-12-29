@@ -7,10 +7,10 @@ use clap::CommandFactory;
 use clap_complete::shells::{Bash, Elvish, Fish, PowerShell, Zsh};
 use clap_complete::{generate, Generator};
 use colored::Colorize;
-use std::process::Command;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
+use std::process::Command;
 
 pub fn handle_completion(action: &ShellCompletionAction) {
     let mut cmd = Cli::command();
@@ -50,7 +50,7 @@ fn install_windows(cmd: &mut clap::Command) {
 
     if is_powershell && !is_git_bash {
         if let Some(policy) = powershell_execution_policy() {
-            if matches!(policy.as_str(), "Restricted" | "AllSigned"){
+            if matches!(policy.as_str(), "Restricted" | "AllSigned") {
                 eprintln!(
                     "\nPowerShell execution policy is too restrictive ({policy})\n\
                     Completion scripts cannot be sourced.\n\n\
@@ -118,7 +118,6 @@ fn install_windows(cmd: &mut clap::Command) {
                             "Added sourcing line to PowerShell profile: {}",
                             profile_path.display().to_string().as_str().cyan()
                         );
-
                     }
                 } else {
                     println!(
@@ -127,9 +126,7 @@ fn install_windows(cmd: &mut clap::Command) {
                     );
                 }
             }
-            println!(
-                "Restart PowerShell to activate completions!",
-            );
+            println!("Restart PowerShell to activate completions!",);
         } else {
             println!("Could not detect any PowerShell profile.");
         }
@@ -469,11 +466,7 @@ fn powershell_execution_policy() -> Option<String> {
 
         if let Ok(output) = output {
             if output.status.success() {
-                return Some(
-                    String::from_utf8_lossy(&output.stdout)
-                        .trim()
-                        .to_string(),
-                );
+                return Some(String::from_utf8_lossy(&output.stdout).trim().to_string());
             }
         }
     }

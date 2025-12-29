@@ -1,7 +1,7 @@
-mod validate_presets;
-mod validate_general;
 #[cfg(test)]
 mod tests;
+mod validate_general;
+mod validate_presets;
 
 use toml::Value;
 use validate_general::validate_general;
@@ -9,24 +9,11 @@ use validate_presets::validate_presets;
 
 #[derive(Debug)]
 pub enum ValidationError {
-    MissingSection {
-        section: &'static str,
-    },
-    MissingKey {
-        key: String,
-        section: String,
-    },
-    InvalidValue {
-        key: String,
-        value: String,
-    },
-    InvalidKey {
-        preset: String,
-        key: String
-    },
-    NoEntries {
-        section: String,
-    },
+    MissingSection { section: &'static str },
+    MissingKey { key: String, section: String },
+    InvalidValue { key: String, value: String },
+    InvalidKey { preset: String, key: String },
+    NoEntries { section: String },
     NoEnabledPresets,
     Io(std::io::Error),
 }
@@ -49,17 +36,22 @@ impl std::fmt::Display for ValidationError {
             }
             ValidationError::InvalidValue { key, value } => {
                 write!(f, "invalid value '{}' for key '{}'", value, key)
-            },
-            ValidationError::InvalidKey { preset, key} => {
+            }
+            ValidationError::InvalidKey { preset, key } => {
                 write!(f, "invalid key '{}' in {}", key, preset)
-            },
+            }
             ValidationError::NoEntries { section } => {
                 write!(f, "no entries for {} section", section)
             }
             ValidationError::NoEnabledPresets => {
-                write!(f, "There are no enabled presets in the [preset] section of the config file.")
+                write!(
+                    f,
+                    "There are no enabled presets in the [preset] section of the config file."
+                )
             }
-            ValidationError::Io(e) => write!(f, "input/output error while validating config: {}", e),
+            ValidationError::Io(e) => {
+                write!(f, "input/output error while validating config: {}", e)
+            }
         }
     }
 }

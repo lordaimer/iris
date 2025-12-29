@@ -1,5 +1,5 @@
+use super::{process_utils::resolve_path, GeneralConfig, Mode, Target};
 use toml::Value;
-use super::{GeneralConfig, Mode, Target, process_utils::resolve_path};
 
 pub fn process_general(value: &Value) -> GeneralConfig {
     let general = value.get("general").unwrap().as_table().unwrap();

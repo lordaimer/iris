@@ -34,7 +34,10 @@ fn general_missing_required_key() {
 target = "downloads"
 "#;
     let result = validate_general(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::MissingKey { key: _, section: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::MissingKey { key: _, section: _ })
+    ));
 }
 
 #[test]
@@ -44,7 +47,10 @@ fn general_invalid_value() {
 mode = "invalid"
 "#;
     let result = validate_general(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::InvalidValue { key: _, value: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::InvalidValue { key: _, value: _ })
+    ));
 }
 
 #[test]
@@ -55,14 +61,20 @@ mode = "relative"
 extra = "oops"
 "#;
     let result = validate_general(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::InvalidKey { preset: _, key: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::InvalidKey { preset: _, key: _ })
+    ));
 }
 
 #[test]
 fn general_empty_section() {
     let toml = r#"[general]"#;
     let result = validate_general(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::NoEntries { section: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::NoEntries { section: _ })
+    ));
 }
 
 // ===== PRESETS SECTION TESTS =====
@@ -87,7 +99,10 @@ fn presets_missing_required_key() {
         absolute_path = "/home/user/docs"
     "#;
     let result = validate_presets(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::MissingKey { key: _, section: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::MissingKey { key: _, section: _ })
+    ));
 }
 
 #[test]
@@ -100,7 +115,10 @@ fn presets_invalid_value() {
         absolute_path = "/home/user/docs"
     "#;
     let result = validate_presets(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::InvalidValue { key: _, value: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::InvalidValue { key: _, value: _ })
+    ));
 }
 
 #[test]
@@ -114,19 +132,28 @@ fn presets_extra_invalid_key() {
         foo = "bar"
     "#;
     let result = validate_presets(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::InvalidKey { preset: _, key: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::InvalidKey { preset: _, key: _ })
+    ));
 }
 
 #[test]
 fn presets_empty_table() {
     let toml = r#"[preset.docs]"#;
     let result = validate_presets(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::NoEntries { section: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::NoEntries { section: _ })
+    ));
 }
 
 #[test]
 fn presets_no_presets_table() {
     let toml = r#""#; // empty TOML
     let result = validate_presets(&parse_toml(toml));
-    assert!(matches!(result, Err(ValidationError::MissingSection { section: _ })));
+    assert!(matches!(
+        result,
+        Err(ValidationError::MissingSection { section: _ })
+    ));
 }

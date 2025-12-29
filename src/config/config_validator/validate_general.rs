@@ -1,26 +1,26 @@
+use super::ValidationError;
 use std::collections::HashMap;
 use toml::Value;
-use super::ValidationError;
 pub fn validate_general(value: &Value) -> Result<(), ValidationError> {
     // Check if "general" table exists
     let general = match value.get("general") {
         Some(Value::Table(general)) => general,
-        _ => return Err(ValidationError::MissingSection {
-            section: "general"
-        }),
+        _ => return Err(ValidationError::MissingSection { section: "general" }),
     };
 
     if general.is_empty() {
         return Err(ValidationError::NoEntries {
             section: "general".to_string(),
-        })
+        });
     }
 
     let mut allowed_entries: HashMap<&str, (bool, Option<Vec<&str>>)> = HashMap::new();
-    allowed_entries.insert("target", (false, Some(vec!["required", "downloads", "current"])));
+    allowed_entries.insert(
+        "target",
+        (false, Some(vec!["required", "downloads", "current"])),
+    );
     allowed_entries.insert("mode", (true, Some(vec!["relative", "absolute"])));
     allowed_entries.insert("presets_path", (false, None));
-
 
     // iterate through fields in general
     for (key, value) in general {
@@ -28,7 +28,7 @@ pub fn validate_general(value: &Value) -> Result<(), ValidationError> {
             return Err(ValidationError::InvalidKey {
                 preset: "general".to_string(),
                 key: key.to_string(),
-            })
+            });
         }
 
         let (_, valid) = &allowed_entries[key.as_str()];
@@ -50,7 +50,7 @@ pub fn validate_general(value: &Value) -> Result<(), ValidationError> {
             return Err(ValidationError::MissingKey {
                 key: allowed_key.to_string(),
                 section: "general".to_string(),
-            })
+            });
         }
     }
     Ok(())

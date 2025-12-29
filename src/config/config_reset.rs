@@ -1,9 +1,8 @@
+use crate::config::config_init::init_defaults;
+use crate::paths::config_path::get_config_path;
+use colored::Colorize;
 /// Reset the config file to defaults with `iris config reset`
 use std::io::{self, Write};
-use colored::Colorize;
-use crate::paths::config_path::get_config_path;
-use crate::config::config_init::init_defaults;
-
 
 /// Reset the config file to defaults based on user prompt
 pub fn reset_config(noconfirm: bool) -> Result<(), Box<dyn std::error::Error>> {

@@ -1,8 +1,8 @@
+use dunce;
+use shellexpand;
 use std::env;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
-use shellexpand;
-use dunce;
 
 #[cfg(windows)]
 /// Remove surrounding quotes or a stray trailing quote from a path-like input on Windows.
@@ -82,8 +82,8 @@ pub fn resolve_path(
     {
         raw_path
     } else {
-        let base = env::current_dir()
-            .map_err(|e| format!("failed to get current directory: {}", e))?;
+        let base =
+            env::current_dir().map_err(|e| format!("failed to get current directory: {}", e))?;
         base.join(raw_path)
     };
 
@@ -395,4 +395,3 @@ mod tests {
         }
     }
 }
-
