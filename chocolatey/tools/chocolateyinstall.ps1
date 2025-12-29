@@ -5,7 +5,7 @@ $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
   fileType       = 'exe'
   url64bit       = 'https://github.com/lordaimer/iris/releases/latest/download/iris-windows-amd64.exe'
-  checksum64     = '71f88c53d7421c15ceb59515407d525ffcfdc39bf70dd57338d5838b01a4177b'
+  checksum64     = 'be61dd6a47c92dcda027d123f467bcf42e1eb32efd63aa5def7e0522aec61aef'
   checksumType64 = 'sha256'
 }
 
