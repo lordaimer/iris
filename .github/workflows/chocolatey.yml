@@ -5,6 +5,11 @@ on:
     workflows: ["Release"]
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name (e.g. v1.3.4)'
+        required: true
 
 permissions:
   contents: write
@@ -12,7 +17,7 @@ permissions:
 jobs:
   update-chocolatey:
     runs-on: windows-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,7 +27,7 @@ jobs:
       - name: Update Chocolatey package
         shell: pwsh
         env:
-          TAG_NAME: ${{ github.event.workflow_run.head_branch }}
+          TAG_NAME: ${{ github.event.workflow_run.head_branch || inputs.tag_name }}
         run: |
           $tag = $env:TAG_NAME
           if (-not $tag.StartsWith("v")) {

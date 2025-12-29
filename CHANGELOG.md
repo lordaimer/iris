@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.  
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [1.3.5](https://github.com/lordaimer/iris/compare/v1.3.4...v1.3.5) - 2025-12-29
+
+### What's changed
+
+v1.3.5 fixes the CI workflow bug of not triggering chocolatey update after release finishes
+
+### Fixed
+- add a workflow_dispatch trigger to the update-chocolatey workflow
+
 ## [1.3.4](https://github.com/lordaimer/iris/compare/v1.3.3...v1.3.4) - 2025-12-29
 
 ### What's changed
