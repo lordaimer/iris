@@ -1,6 +1,6 @@
 [package]
 name = "iris-cli"
-version = "1.3.3"
+version = "1.3.4"
 edition = "2021"
 authors = ["lordaimer <araneaimer@gmail.com>"]
 description = "Smart file organization"

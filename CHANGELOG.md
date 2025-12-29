@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.  
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [1.3.4](https://github.com/lordaimer/iris/compare/v1.3.3...v1.3.4) - 2025-12-29
+
+### What's changed
+
+v1.3.4 updates the CI workflow to trigger chocolatey update only after release completes & release == success
+
 ## [1.3.3](https://github.com/lordaimer/iris/compare/v1.3.2...v1.3.3) - 2025-12-29
 
 ### What's changed

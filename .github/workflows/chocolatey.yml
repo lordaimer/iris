@@ -1,13 +1,18 @@
 name: Update Chocolatey Package
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
+
+permissions:
+  contents: write
 
 jobs:
   update-chocolatey:
     runs-on: windows-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,13 +21,39 @@ jobs:
 
       - name: Update Chocolatey package
         shell: pwsh
+        env:
+          TAG_NAME: ${{ github.event.workflow_run.head_branch }}
         run: |
-          $version = $env:GITHUB_REF_NAME -replace '^v', ''
-          $tag = $env:GITHUB_REF_NAME
+          $tag = $env:TAG_NAME
+          if (-not $tag.StartsWith("v")) {
+            Write-Warning "Trigger branch/tag '$tag' does not start with 'v'. Skipping Chocolatey update."
+            exit 0
+          }
+          $version = $tag -replace '^v', ''
           
           # Download the Windows executable
           $downloadUrl = "https://github.com/lordaimer/iris/releases/download/$tag/iris-windows-amd64.exe"
-          Invoke-WebRequest -Uri $downloadUrl -OutFile "iris-windows-amd64.exe"
+          Write-Host "Downloading from: $downloadUrl"
+          
+          # Add a small retry loop for resilience
+          $maxRetries = 5
+          $retryCount = 0
+          $downloaded = $false
+          
+          while (-not $downloaded -and $retryCount -lt $maxRetries) {
+            try {
+              Invoke-WebRequest -Uri $downloadUrl -OutFile "iris-windows-amd64.exe" -ErrorAction Stop
+              $downloaded = $true
+            } catch {
+              Write-Host "Attempt $($retryCount + 1) failed: $_"
+              Start-Sleep -Seconds 10
+              $retryCount++
+            }
+          }
+          
+          if (-not $downloaded) {
+             throw "Failed to download asset after $maxRetries attempts."
+          }
           
           # Calculate SHA256 checksum
           $checksum = (Get-FileHash -Path "iris-windows-amd64.exe" -Algorithm SHA256).Hash.ToLower()
