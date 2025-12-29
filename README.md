@@ -82,3 +82,17 @@ Automatically generate and install completion scripts for your shell. You can al
 ```bash
 iris completions install
 ```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+- Setting up your development environment
+- Coding standards and conventions
+- How to submit pull requests
+- Testing requirements
+
+Check out the [roadmap](.project/roadmap.md) for planned features and improvements.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
