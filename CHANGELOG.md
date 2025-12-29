@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.  
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [1.3.3](https://github.com/lordaimer/iris/compare/v1.3.2...v1.3.3) - 2025-12-29
+
+### What's changed
+
+v1.3.3 moves all the chocolatey packaging to dist/chocolatey branch and updates the github actions workflow to make new commits related to chocolatey in the dist/chocolatey branch
+
 ## [1.3.2](https://github.com/lordaimer/iris/compare/v1.3.1...v1.3.2) - 2025-12-29
 
 ### What's New
