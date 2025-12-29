@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.  
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [1.3.2](https://github.com/lordaimer/iris/compare/v1.3.1...v1.3.2) - 2025-12-29
+
+### What's New
+v1.3.2 introduces a pre-push hook that verifies the changelog entry exists for the version being pushed.
+
+### Added
+- pre-push hook to verify changelog entry exists for the version being pushed
+
+### Fixed
+- Fix build failures when changelog entry doesn't exist for the version being built
+
 ## [1.3.1](https://github.com/lordaimer/iris/compare/v1.3.0...v1.3.1) - 2025-12-29
 
 ### What's Changed

@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# An example hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+
+remote="$1"
+url="$2"
+
+echo "Running pre-push hook..."
+
+# Define the path to Cargo.toml and CHANGELOG.md relative to the repo root
+CARGO_TOML="Cargo.toml"
+CHANGELOG="CHANGELOG.md"
+
+# Extract the version from Cargo.toml
+# Assumes the first 'version = "..."' line is the package version
+VERSION=$(grep -m 1 '^version = ' "$CARGO_TOML" | sed 's/version = "//;s/"//')
+
+if [ -z "$VERSION" ]; then
+    echo "Error: Could not determine version from $CARGO_TOML"
+    exit 1
+fi
+
+echo "Current Project Version: $VERSION"
+
+# Loop through the commits being pushed
+z40=0000000000000000000000000000000000000000
+
+while read local_ref local_oid remote_ref remote_oid; do
+    # Check if we are pushing to main
+    if [ "$remote_ref" = "refs/heads/main" ]; then
+        echo "Pushing to main branch. Verifying Changelog..."
+
+        # Check if the changelog contains the version header
+        # Looking for "## [VERSION]" or "## VERSION" or similar
+        # Based on file check: "## [1.3.1](...)"
+        
+        if ! grep -q "## \[$VERSION\]" "$CHANGELOG"; then
+            echo "Error: CHANGELOG.md does not contain an entry for version $VERSION."
+            echo "Please update the changelog before pushing to main."
+            exit 1
+        fi
+        
+        echo "Changelog entry found for $VERSION."
+    fi
+done
+
+exit 0
