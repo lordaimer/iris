@@ -86,3 +86,28 @@ jobs:
           git add $nuspecPath $installPath
           git commit -m "chore[chocolatey]: update Chocolatey package to $tag"
           git push
+      # Pack and Push to Chocolatey after successful tests
+      - name: Verify and Push to Chocolatey
+        shell: pwsh
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: |
+          # 1. Pack
+          choco pack chocolatey/iris.nuspec
+          $nupkg = (Get-ChildItem *.nupkg | Select-Object -First 1).Name
+
+          # 2. Verify (Local Install)
+          Write-Host "Verifying package install..."
+          try {
+            choco install iris-cli --source . --yes
+          } catch {
+             Write-Error "Verification failed: $_"
+             exit 1
+          }
+          
+          # 3. Push (only runs if install didn't fail)
+          Write-Host "Verification successful. Pushing to Chocolatey..."
+          choco push $nupkg --source https://push.chocolatey.org/ --api-key $env:CHOCO_API_KEY
+          
+          # 4. Cleanup (uninstall)
+          choco uninstall iris-cli --yes
