@@ -7,7 +7,7 @@
     <title>Iris - Fast File Organizer</title>
     <authors>Arane Aimer</authors>
     <projectUrl>https://github.com/lordaimer/iris</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/lordaimer/iris/main/assets/icon/iris.ico</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/lordaimer/iris/main/assets/icon/iris.png</iconUrl>
     <copyright>2025 Arane Aimer</copyright>
     <licenseUrl>https://github.com/lordaimer/iris/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -45,7 +45,7 @@ iris config edit
 
 For more information, visit the [GitHub repository](https://github.com/lordaimer/iris).
     </description>
-    <releaseNotes>https://github.com/lordaimer/iris/releases/tag/v1.3.0</releaseNotes>
+    <releaseNotes>https://github.com/lordaimer/iris/releases/tag/v1.3.5</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
