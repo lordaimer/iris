@@ -67,12 +67,14 @@ jobs:
           $nuspecPath = "chocolatey/iris.nuspec"
           $nuspecContent = Get-Content $nuspecPath -Raw
           $nuspecContent = $nuspecContent -replace '<id>iris-cli</id>\s*<version>[\d\.]+</version>', "<id>iris-cli</id>`r`n    <version>$version</version>"
+          $nuspecContent = $nuspecContent -replace '<releaseNotes>.*?</releaseNotes>', "<releaseNotes>https://github.com/lordaimer/iris/releases/tag/$tag</releaseNotes>"
           Set-Content -Path $nuspecPath -Value $nuspecContent -NoNewline
           
           # Update install script (chocolatey/tools/chocolateyinstall.ps1)
           $installPath = "chocolatey/tools/chocolateyinstall.ps1"
           $installContent = Get-Content $installPath -Raw
           $installContent = $installContent -replace "checksum64\s*=\s*'[a-fA-F0-9]{64}'", "checksum64     = '$checksum'"
+          $installContent = $installContent -replace "\`$version\s*=\s*'[\d\.]+'", "`$version = '$version'"
           Set-Content -Path $installPath -Value $installContent -NoNewline
           
           # Cleanup
