@@ -40,6 +40,43 @@
 - [ ] **Undo Command** `[Priority: Low/Future]`
     - [ ] `iris undo` to reverse last operation.
 
+## Cleanup & Archiving
+*Automated file maintenance and archiving strategies.*
+
+- [ ] **Duplicate Detection** `[Priority: High]`
+    - *Goal*: Identify and handle duplicate files.
+    - [ ] Implement hash-based duplicate detection
+    - [ ] Add `iris cleanup duplicates` command.
+    - [ ] Config for duplicate handling modes: `delete`, `move-to-folder`, `keep-newest`, `keep-largest`, `interactive`.
+    - [ ] Config for duplicate handling criteria: keep `oldest`, `newest`.
+- [ ] **Old File Cleanup** `[Priority: High]`
+    - *Goal*: Automatically remove or archive files based on age.
+    - [ ] Add `age_threshold` config option (e.g., `30d`, `6m`, `1y`).
+    - [ ] Implement `iris cleanup old` command.
+    - [ ] Config for old file cleanup actions: `delete`, `archive`, `move-to-trash`.
+- [ ] **Archive Command** `[Priority: Medium]`
+    - *Goal*: Compress and archive old or infrequently accessed files.
+    - [ ] Implement `iris archive <folder>` command.
+    - [ ] Support compression formats: `.zip`, `.tar.gz`, `.tar.zst`, `.7z`.
+    - [ ] Config for archive naming: timestamp-based or custom pattern.
+    - [ ] Config for archive deletion: delete originals after successful archiving.
+    - [ ] Config for archive date ranges (e.g., archive all files from 2023).
+- [ ] **Temporary File Cleanup** `[Priority: Medium]`
+    - *Goal*: Remove system and application temporary files.
+    - [ ] Detect common temp file patterns (`.tmp`, `.cache`, `~$*`, etc.).
+    - [ ] Add `iris cleanup temp` command.
+    - [ ] Config for safe deletion with whitelist/blacklist (only delete files matching patterns in whitelist while omitting patterns in blacklist).
+- [ ] **Empty Directory Removal** `[Priority: Low]`
+    - *Goal*: Clean up empty folders after sorting operations.
+    - [ ] Config for empty directory removal.
+    - [ ] Implement `iris cleanup empty` command.
+    - [ ] Recursive empty directory detection config flag.
+- [ ] **Archive Rotation** `[Priority: Low/Future]`
+    - *Goal*: Maintain archive history with automatic rotation.
+    - [ ] Config for archive rotation interval (e.g., `7d`, `1m`, `1y`).
+    - [ ] Config for archive rotation retention policy (e.g., `keep_last_n`, `keep_within_time_window`).
+    - [ ] Config for automatic deletion of old archives based on retention policy.
+
 ## Sorting Logic & Filters
 *Rules for how and what to sort.*
 
