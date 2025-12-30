@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.  
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [1.3.6](https://github.com/lordaimer/iris/compare/v1.3.5...v1.3.6) - 2025-12-30
+
+### What's changed
+
+v1.3.6 updates the Chocolatey Package Update CI workflow to update version and release notes
+
+### Fixed
+- make url64bit point to static link in chocolateyinstaller.ps1 instead of /latest
+- update chocolatey update CI workflow to update version and release notes
+- add a new .png icon in assets/icon/ for Chocolatey compatibility
+
 ## [1.3.5](https://github.com/lordaimer/iris/compare/v1.3.4...v1.3.5) - 2025-12-29
 
 ### What's changed
