@@ -31,13 +31,19 @@ Iris helps you sort and organize your messy folders automatically using defined 
 Download the latest release for your platform from the [Releases Page](https://github.com/lordaimer/iris/releases).
 
 ### Scoop (Windows)
-Add our bucket and install:
+```powershell
+scoop install iris
+```
+
+<details>
+<summary>Alternative: Install from our bucket</summary>
+
+If you prefer to use our bucket directly:
 ```powershell
 scoop bucket add iris https://github.com/lordaimer/iris
 scoop install iris/iris
 ```
-
-> **Note**: We've also submitted Iris to the official Scoop Extras bucket. Once approved, you'll be able to install with just `scoop install iris`.
+</details>
 
 ### From Crates.io
 ```bash
