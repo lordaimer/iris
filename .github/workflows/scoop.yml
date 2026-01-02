@@ -1,0 +1,115 @@
+name: Update Scoop Bucket
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name (e.g. v1.3.4)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  update-scoop:
+    runs-on: windows-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Scoop manifest
+        shell: pwsh
+        env:
+          TAG_NAME: ${{ github.event.workflow_run.head_branch || inputs.tag_name }}
+        run: |
+          $tag = $env:TAG_NAME
+          if (-not $tag.StartsWith("v")) {
+            Write-Warning "Trigger branch/tag '$tag' does not start with 'v'. Skipping Scoop update."
+            exit 0
+          }
+          $version = $tag -replace '^v', ''
+          
+          Write-Host "Updating Scoop manifest for version: $version"
+          
+          # download the windows executable
+          $downloadUrl = "https://github.com/lordaimer/iris/releases/download/$tag/iris-windows-amd64.exe"
+          Write-Host "Downloading from: $downloadUrl"
+          
+          # add a small retry loop for resilience
+          $maxRetries = 5
+          $retryCount = 0
+          $downloaded = $false
+          
+          while (-not $downloaded -and $retryCount -lt $maxRetries) {
+            try {
+              Invoke-WebRequest -Uri $downloadUrl -OutFile "iris-windows-amd64.exe" -ErrorAction Stop
+              $downloaded = $true
+            } catch {
+              Write-Host "Attempt $($retryCount + 1) failed: $_"
+              Start-Sleep -Seconds 10
+              $retryCount++
+            }
+          }
+          
+          if (-not $downloaded) {
+             throw "Failed to download asset after $maxRetries attempts."
+          }
+          
+          # verify download
+          $fileSize = (Get-Item "iris-windows-amd64.exe").Length
+          Write-Host "Downloaded file size: $fileSize bytes"
+          if ($fileSize -lt 100000) {
+            throw "Downloaded file is suspiciously small ($fileSize bytes). Aborting."
+          }
+          
+          # calculate sha256 checksum
+          $checksum = (Get-FileHash -Path "iris-windows-amd64.exe" -Algorithm SHA256).Hash.ToLower()
+          Write-Host "Calculated hash: $checksum"
+          
+          # update scoop manifest using regex to preserve formatting
+          $manifestPath = "bucket/iris.json"
+          $manifestContent = Get-Content $manifestPath -Raw
+          
+          # update version (line 2)
+          $manifestContent = $manifestContent -replace '"version":\s*"[\d\.]+"', "`"version`": `"$version`""
+          
+          # update hash (line 9)
+          $manifestContent = $manifestContent -replace '"hash":\s*"[a-f0-9]{64}"', "`"hash`": `"$checksum`""
+          
+          # write back to file
+          Set-Content -Path $manifestPath -Value $manifestContent -NoNewline
+          
+          # validate the json is still valid
+          try {
+            $null = Get-Content $manifestPath -Raw | ConvertFrom-Json
+            Write-Host "✓ Manifest JSON is valid"
+          } catch {
+            throw "Generated manifest is invalid JSON: $_"
+          }
+          
+          # cleanup
+          Remove-Item "iris-windows-amd64.exe"
+          
+          # check if there are actual changes
+          $gitStatus = git status --porcelain $manifestPath
+          if (-not $gitStatus) {
+            Write-Host "No changes detected in manifest. Skipping commit."
+            exit 0
+          }
+          
+          # commit and push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add $manifestPath
+          git commit -m "chore[scoop]: update scoop manifest to $tag"
+          git push
+          
+          Write-Host "✓ Successfully updated Scoop manifest to $version"
+
