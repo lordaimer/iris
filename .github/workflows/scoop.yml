@@ -80,6 +80,9 @@ jobs:
           # update version (line 2)
           $manifestContent = $manifestContent -replace '"version":\s*"[\d\.]+"', "`"version`": `"$version`""
           
+          # update url (line 8) - critical fix to ensure concrete URL is used
+          $manifestContent = $manifestContent -replace '"url":\s*"https://.*/v[\d\.]+/.*"', "`"url`": `"https://github.com/lordaimer/iris/releases/download/$tag/iris-windows-amd64.exe`""
+
           # update hash (line 9)
           $manifestContent = $manifestContent -replace '"hash":\s*"[a-f0-9]{64}"', "`"hash`": `"$checksum`""
           
