@@ -30,6 +30,12 @@ Iris helps you sort and organize your messy folders automatically using defined 
 ### Download Binary
 Download the latest release for your platform from the [Releases Page](https://github.com/lordaimer/iris/releases).
 
+### Chocolatey (Windows)
+Run the following command in an elevated PowerShell: 
+```powershell
+choco install iris
+```
+
 ### Scoop (Windows)
 ```powershell
 scoop install iris
