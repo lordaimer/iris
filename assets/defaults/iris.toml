@@ -315,7 +315,7 @@ absolute_path = "~/Code/scripts"
 [preset.design]
 enabled = true
 extension = [
-    "psd", "ai", "xd", "indd", "idml", "sketch", "fig"
+    "psd", "psb", "ai", "xd", "indd", "idml", "sketch", "fig"
 ]
 relative_path = "design"
 absolute_path = "~/Design"
